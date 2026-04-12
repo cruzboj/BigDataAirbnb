@@ -2,21 +2,21 @@
 
 
 erDiagram
-    fact_airbnb ||--o{ dimHost : "contains"
-    fact_airbnb ||--o{ dimRentDetails : "contains"
-    fact_airbnb ||--o{ dimLocation : "contains"
-    fact_airbnb ||--o{ dimReview : "contains"
+    fact_airbnb ||--|| dimRentDetails : "has details"
+    fact_airbnb ||--|| dimLocation : "located in"
+    fact_airbnb ||--|| dimReview : "has reviews"
+    fact_airbnb ||--|| dimDate : "has dates"
+    fact_airbnb }|--|| dimHost : "hosted by"
 
     fact_airbnb{
         int id PK
         int host_id PK
-        int rent_id PK
-        int location_id PK
-        int review_id PK
+        bool has_availability
+        float price
     }
 
     dimHost{
-        string host_id FK
+        string host_id PK
 
         string host_url
         string host_profile_id
@@ -35,7 +35,7 @@ erDiagram
         bool host_is_superhost
         string host_thumbnail_url "missing"
         string host_picture_url
-        string host_neighbourhood "missing"
+        
         int host_listings_count
         int host_total_listings_count "missing"
         string host_verifications "null"
@@ -43,22 +43,20 @@ erDiagram
         string host_identity_verified
         string host_neighbourhood_cleansed
         string host_neighbourhood_group_cleansed
-        string host_latitude
-        string host_longitude
+
         string host_property_type
         list host_room_type "[Entire home/apt, Private room ,Shared room]" 
     }
 
     dimRentDetails{
-        int rent_id FK
+        int id PK
 
-        string accommodates
+        int accommodates
         int bathrooms
         string bathrooms_text
         int bedrooms
-        int bed
+        int beds
         list amenities
-        float price
         int minimum_nights
         int maximum_nights
         int minimum_minimum_nights
@@ -67,46 +65,43 @@ erDiagram
         int maximum_maximum_nights
         int minimum_nights_avg_ntm
         int maximum_nights_avg_ntm
-        datetime calendar_updated
-        bool has_availability
         int availability_30
         int availability_60
         int availability_90
-        int availability_365
-        datetime calendar_last_scraped
+        int availability_365 
         int availability_eoy
         int estimated_occupancy_l365d
         int estimated_revenue_l365d "missing"
         string license
-        bool instant_bookable missing
+        bool instant_bookable "missing"
         int calculated_host_listings_count
         int calculated_host_listings_count_entire_homes
         int calculated_host_listings_count_private_rooms
-        calculated_host_listings_count_shared_rooms
+        int calculated_host_listings_count_shared_rooms
     }
 
     dimLocation{
-        int location_id FK
+        int id PK
 
         string listing_url
         string scrape_id
-        datetime last_scraped
         string source
         string name
         string description
         string neighborhood_overview
         string picture_url
+        string host_latitude
+        string host_longitude
+        string host_neighbourhood "missing"
     }
 
     dimReview {
-        int review_id FK
+        int id PK
 
         int number_of_reviews
         int number_of_reviews_ltm
         int number_of_reviews_l30d
         int number_of_reviews_ly 
-        datetime first_review
-        datetime last_review
         float review_scores_rating
         float review_scores_accuracy
         float review_scores_cleanliness
@@ -115,4 +110,14 @@ erDiagram
         float review_scores_location
         float review_scores_value
         float reviews_per_month
+    }
+
+    dimDate {
+        int id PK
+
+        datetime last_scraped
+        datetime calendar_updated
+        datetime first_review
+        datetime last_review
+        datetime calendar_last_scraped
     }
