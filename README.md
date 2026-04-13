@@ -2,46 +2,66 @@
 
 
 erDiagram
-    fact_airbnb ||--|| dimRentDetails : "has details"
-    fact_airbnb ||--|| dimLocation : "located in"
-    fact_airbnb ||--|| dimReview : "has reviews"
-    fact_airbnb ||--|| dimDate : "has dates"
-    fact_airbnb }|--|| dimHost : "hosted by"
+    fact_airbnb }|--|| dimHost : "type 0"
+    fact_airbnb ||--|| dimRentDetails : "type 0"
+    fact_airbnb ||--|| dimLocation : "type 0"
+    fact_airbnb ||--|| dimReview : "type 2 SCD"
+    fact_airbnb ||--|| dimMetadata : "type 0"
+    fact_airbnb ||--|| dimHostMetrics : "type 2 SCD"
+    fact_airbnb ||--|| dimRentMetrics : "type 2 SCD"
 
     fact_airbnb{
         int id PK
         int host_id FK
+        int rent_details_id FK
+        int location_id FK
+        int review_id FK
+        int metadata_id FK
+        int host_metrics_id FK
+        int rent_metrics_id FK
+
         bool has_availability
         float price
     }
 
     dimHost{
-        string host_id PK
+        int id PK
+        string host_id
 
         string host_url
         string host_profile_id
         string host_profile_url
         string host_name
-
-        list host_response_time "[within an hour, within a day, a few days or more , N/A]"
-        float host_response_rate 
         string host_thumbnail_url
         string host_neighbourhood 
         int host_total_listings_count
-        int hosts_time_as_user_years
-        int hosts_time_as_user_months
-        int hosts_time_as_host_months
-        int hosts_time_as_host_years
+
         string host_location 
         string host_about
-        int host_acceptance_rate
         bool host_is_superhost
         string host_picture_url
         list host_verifications "[email,phone,work_email]"
-        string host_has_profile_pic 
-        string host_identity_verified
+        bool host_has_profile_pic 
+        bool host_identity_verified
         string host_property_type
         list host_room_type "[Entire home/apt, Private room ,Shared room]" 
+    }
+
+    dimHostMetrics{
+        int id PK
+
+        datetime start_date
+        datetime end_date
+        bool is_current
+
+        list host_response_time "[within an hour, within a day, a few days or more , N/A]"
+        float host_response_rate 
+        int host_acceptance_rate
+
+        int hosts_time_as_host_months
+        int hosts_time_as_host_years
+        int hosts_time_as_user_years
+        int hosts_time_as_user_months
     }
 
     dimRentDetails{
@@ -61,14 +81,23 @@ erDiagram
         int maximum_maximum_nights
         int minimum_nights_avg_ntm
         int maximum_nights_avg_ntm
+        string license
+    }
+
+    dimRentMetrics{
+        int id PK
+
+        datetime start_date
+        datetime end_date
+        bool is_current
+
+        int estimated_occupancy_l365d
+        int estimated_revenue_l365d
         int availability_30
         int availability_60
         int availability_90
         int availability_365 
         int availability_eoy
-        int estimated_occupancy_l365d
-        int estimated_revenue_l365d
-        string license
         bool instant_bookable
         int calculated_host_listings_count
         int calculated_host_listings_count_entire_homes
@@ -80,21 +109,25 @@ erDiagram
         int id PK
 
         string listing_url
-        string scrape_id
-        string source
         string name
         string description
         string neighbourhood
         string neighborhood_overview
         string picture_url
-        string host_latitude
-        string host_longitude
+        float latitude
+        float longitude
         string host_neighbourhood 
     }
 
     dimReview {
         int id PK
 
+        datetime start_date
+        datetime end_date
+        bool is_current
+        
+        datetime first_review
+        datetime last_review
         int number_of_reviews
         int number_of_reviews_ltm
         int number_of_reviews_l30d
@@ -109,11 +142,11 @@ erDiagram
         float reviews_per_month
     }
 
-    dimDate {
+    dimMetadata {
         int id PK
-
+        
+        string source
+        string scrape_id
         datetime last_scraped
-        datetime first_review
-        datetime last_review
         datetime calendar_last_scraped
     }
