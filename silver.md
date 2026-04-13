@@ -114,8 +114,8 @@ erDiagram
         string neighbourhood
         string neighborhood_overview
         string picture_url
-        float latitude
-        float longitude
+        location latitude
+        location longitude
         string host_neighbourhood 
     }
 
