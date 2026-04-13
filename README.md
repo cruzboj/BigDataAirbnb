@@ -10,7 +10,7 @@ erDiagram
 
     fact_airbnb{
         int id PK
-        int host_id PK
+        int host_id FK
         bool has_availability
         float price
     }
@@ -22,28 +22,24 @@ erDiagram
         string host_profile_id
         string host_profile_url
         string host_name
-        string host_since "missing"
+
+        list host_response_time "[within an hour, within a day, a few days or more , N/A]"
+        float host_response_rate 
+        string host_thumbnail_url
+        string host_neighbourhood 
+        int host_total_listings_count
         int hosts_time_as_user_years
         int hosts_time_as_user_months
         int hosts_time_as_host_months
         int hosts_time_as_host_years
         string host_location 
         string host_about
-        string host_response_time "missing"
-        string host_response_rate "missing"
-        string host_acceptance_rate "missing"
+        int host_acceptance_rate
         bool host_is_superhost
-        string host_thumbnail_url "missing"
         string host_picture_url
-        
-        int host_listings_count
-        int host_total_listings_count "missing"
-        string host_verifications "null"
+        list host_verifications "[email,phone,work_email]"
         string host_has_profile_pic 
         string host_identity_verified
-        string host_neighbourhood_cleansed
-        string host_neighbourhood_group_cleansed
-
         string host_property_type
         list host_room_type "[Entire home/apt, Private room ,Shared room]" 
     }
@@ -71,9 +67,9 @@ erDiagram
         int availability_365 
         int availability_eoy
         int estimated_occupancy_l365d
-        int estimated_revenue_l365d "missing"
+        int estimated_revenue_l365d
         string license
-        bool instant_bookable "missing"
+        bool instant_bookable
         int calculated_host_listings_count
         int calculated_host_listings_count_entire_homes
         int calculated_host_listings_count_private_rooms
@@ -88,11 +84,12 @@ erDiagram
         string source
         string name
         string description
+        string neighbourhood
         string neighborhood_overview
         string picture_url
         string host_latitude
         string host_longitude
-        string host_neighbourhood "missing"
+        string host_neighbourhood 
     }
 
     dimReview {
@@ -116,7 +113,6 @@ erDiagram
         int id PK
 
         datetime last_scraped
-        datetime calendar_updated
         datetime first_review
         datetime last_review
         datetime calendar_last_scraped
