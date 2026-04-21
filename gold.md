@@ -3,6 +3,19 @@
 erDiagram
     %% Business Question: What cities are best invest promoting in?
     
+
+    fact_ads{
+        
+    }
+
+    fact_listings{
+        
+    }
+
+    fact_reviews{
+
+    }
+    
     neighbourhoodInvestMetrics {
         int neighbourhood_id PK
         string city_name 
@@ -23,7 +36,7 @@ erDiagram
         string provider_name
 
         float provider_conversion_rate
-        float most_clicked_age_group
+        float most_clicked_provider
         int post_amount
         float avg_campaign_conversion
         float avg_campaign_cost

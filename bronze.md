@@ -97,11 +97,11 @@ erDiagram
         int reviewer_id 
         string reviewer_name    
         string comments
+
         string language
         float sentiment_score
         list sentiment_label "[positive,negative,neutral]"
         int likes_votes 
-
         timestamp event_ingestion_time
         string raw_user_agent 
         float bot_suspicion_score 

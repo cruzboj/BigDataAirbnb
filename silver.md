@@ -1,32 +1,10 @@
 ```mermaid
 
-
 erDiagram
-    factAirbnb }|--|| dimHost : "type 0"
-    factAirbnb ||--|| dimRentDetails : "type 0"
-    factAirbnb ||--|| dimLocation : "type 0"
-    factAirbnb ||--|| dimReview : "type 2 SCD"
-    factAirbnb ||--|| dimMetadata : "type 0"
-    factAirbnb ||--|| dimHostMetrics : "type 2 SCD"
-    factAirbnb ||--|| dimRentMetrics : "type 2 SCD"
-
-    factAirbnb{
-        int id PK
-        int host_id FK
-        int rent_details_id FK
-        int location_id FK
-        int review_id FK
-        int metadata_id FK
-        int host_metrics_id FK
-        int rent_metrics_id FK
-
-        bool has_availability
-        float price
-    }
-
-    dimHost{
+    HostDetails{
         int id PK
         string host_id
+        int listing_id FK
 
         string host_url
         string host_profile_id
@@ -47,8 +25,8 @@ erDiagram
         list host_room_type "[Entire home/apt, Private room ,Shared room]" 
     }
 
-    dimHostMetrics{
-        int id PK
+    HostMetrics{
+        int id PK "(FK listing_id from hostDetails)"
 
         datetime start_date
         datetime end_date
@@ -64,8 +42,8 @@ erDiagram
         int hosts_time_as_user_months
     }
 
-    dimRentDetails{
-        int id PK
+    RentDetails{
+        int id PK "(FK listing_id from hostDetails)"
 
         int accommodates
         int bathrooms
@@ -84,13 +62,15 @@ erDiagram
         string license
     }
 
-    dimRentMetrics{
-        int id PK
-
+    RentMetrics{
+        int id PK "(FK listing_id from hostDetails)"
+        
         datetime start_date
         datetime end_date
         bool is_current
+        float price_per_night
 
+        bool has_availability
         int estimated_occupancy_l365d
         int estimated_revenue_l365d
         int availability_30
@@ -105,8 +85,8 @@ erDiagram
         int calculated_host_listings_count_shared_rooms
     }
 
-    dimLocation{
-        int id PK
+    Location{
+        int id PK "(FK listing_id from hostDetails)"
 
         string listing_url
         string name
@@ -119,9 +99,10 @@ erDiagram
         string host_neighbourhood 
     }
 
-    dimReview {
-        int id PK
-
+    Review{
+        int id PK "(FK listing_id from hostDetails)"
+        
+        datetime date   
         datetime start_date
         datetime end_date
         bool is_current
@@ -140,9 +121,20 @@ erDiagram
         float review_scores_location
         float review_scores_value
         float reviews_per_month
+
+        int reviewer_id 
+        string reviewer_name    
+        string comments
+        string language
+        float sentiment_score
+        list sentiment_label "[positive,negative,neutral]"
+        int likes_count 
+        datetime event_ingestion_time
+        float bot_suspicion_score 
+        int time_spent_on_review_ms 
     }
 
-    dimMetadata {
+    Metadata {
         int id PK
         
         string source
@@ -150,3 +142,34 @@ erDiagram
         datetime last_scraped
         datetime calendar_last_scraped
     }
+
+    providerDetails{
+        int id PK
+        
+        string name
+        int price_per_listing
+        int n_listings
+        datetime last_updated
+    }
+
+    providerMetrics{
+        int id PK "FK from providerDetails"
+        
+        float avg_conversion_rate
+        int post_amount
+        long total_impressions
+        long total_clicks
+        float ctr
+        float total_ad_spend
+        float return_on_investment
+        string region_coverage
+
+        float churn_rate
+        float avg_cpc "(Cost Per Click)"
+        float avg_cpm "(Cost Per Mille)"
+
+        int campaigns_count
+        string data_compliance_level "(GDPR/CCPA)"
+        datetime partition_date 
+    }
+    
