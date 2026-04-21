@@ -107,7 +107,7 @@ erDiagram
         float bot_suspicion_score 
         string reviewer_hash_id 
         string aspect_sentiment_json 
-        string extracted_keywords s
+        string extracted_keywords
         int comment_character_count 
         float readability_index 
         string session_id 
