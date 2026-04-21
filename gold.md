@@ -2,36 +2,134 @@
 
 erDiagram
     %% Business Question: What cities are best invest promoting in?
+    %% Business Question: Which promotion strategy is the best?
     
-
-    fact_ads{
-        
-    }
-
-    fact_listings{
-        
-    }
-
-    fact_reviews{
-
+     factListing ||--|| dimLocation : "type 0"
+     factListing }o--|| dimHost: "type 2"
+     factListing ||--|| dimProperty: "type 2"
+     factReview ||--|| dimReviewer: "type 0"
+     factReview }o--|| dimHost: "type 2"
+     factReview ||--|| dimLocation : "type 0"
+     factReview ||--|| dimProperty: "type 2"
+     factAd ||--|| dimProvider: "type 2"
+     
+    
+    
+    factListing{
+      int id
+      int property_key FK
+      int location_key FK
+      int host_key FK
+      
+      int total_listing_count
+      float price_per_night
+      int estimated_occupancy_l365d
+      int estimated_revenue_l365d
+      float host_response_rate 
+      int host_acceptance_rate
     }
     
-    neighbourhoodInvestMetrics {
-        int neighbourhood_id PK
+    dimProperty{
+      datetime start_date
+      datetime end_date
+      bool is_current
+      int property_key
+      list room_type
+      string property_type
+      int bedrooms
+      int beds
+      list ameneties
+      int accommodates
+    }
+    
+    dimLocation{
+      int location_key PK
+
+      string neighbourhood
+      location latitude
+      location longitude
+      string host_neighbourhood 
+    }
+    
+    dimHost {
+      int host_key PK
+      
+      datetime start_date
+      datetime end_date
+      bool is_current
+      string name
+      string response_time_category
+    }
+    
+    factReview{
+      int reviewer_key FK
+      int property_key FK
+      int location_key FK
+      int host_key FK
+     
+     string comment
+     string language
+     int like_count 
+     float sentiment_score
+     float review_scores_rating
+     float review_scores_accuracy
+     float review_scores_cleanliness
+     int number_of_reviews_ltm
+ 
+    }
+    
+    dimReviewer{
+      int reviewer_key
+      int number_of_reviews
+      string reviewer_name    
+    }
+    
+    dimProvider{
+      int provider_key
+      
+      datetime start_date
+      datetime end_date
+      bool is_current
+      string name
+      string desc
+    }
+    
+    factAd{
+      int provider_key FK
+      
+      float avg_conversion_rate
+      int post_amount
+      long total_impressions
+      long total_clicks
+      float ctr
+      float total_ad_spend
+      float return_on_investment
+      string region_coverage
+
+      float churn_rate
+      float avg_cpc "(Cost Per Click)"
+      float avg_cpm "(Cost Per Mille)"
+
+      int campaigns_count
+      string data_compliance_level "(GDPR/CCPA)"
+      datetime partition_date 
+    }
+
+    SummaryNeighbourhoodInvest{
         string city_name 
         string neighbourhood_name
         int neighbourhood_most_views
-        int neighbourhood_most_bookings
+        int neighbourhood_most_bookings "est_revenue_365 / price_per_night"
         int neighbourhood_highest_reviews
         list neighbourhood_needed_boost
         float avg_order_price
-        float avg_revenue_l30d
+        float avg_revenue_l365d
         float avg_review_score
         float median_availability
         float avg_response_rate
     }
     
-    adsMetrics{
+    SummaryAds{
         int provider_id PK
         string provider_name
 
@@ -46,25 +144,25 @@ erDiagram
     }
 
 
-    gold_agg_neighborhood_performance {
+    SummaryNeighborhoodPerformance {
         string neighbourhood PK "Grouped by dimLocation.neighbourhood"
         
-        int total_active_listings "COUNT(fact_airbnb.id)"
+        int total_active_listings "COUNT(factListing.id)"
         float avg_price_per_night "AVG(fact_airbnb.price)"
-        float avg_annual_revenue "AVG(dimRentMetrics.estimated_revenue_l365d)"
-        float avg_occupancy_rate "AVG(dimRentMetrics.estimated_occupancy_l365d)"
-        float avg_review_score "AVG(dimReview.review_scores_rating)"
-        int total_reviews_ltm "SUM(dimReview.number_of_reviews_ltm) - indicates current hype"
+        float avg_annual_revenue "AVG(factListing.estimated_revenue_l365d)"
+        float avg_occupancy_rate "AVG(factListing.estimated_occupancy_l365d)"
+        float avg_review_score "AVG(factReview.review_scores_rating)"
+        int total_reviews_ltm "SUM(factReview.number_of_reviews_ltm) - indicates current hype"
     }
 
-    gold_agg_host_economics {
-        string room_type PK "Grouped by dimHost.host_room_type"
+    SummaryHostEconomics {
+        string room_type PK 
         
-        int total_listings "COUNT(fact_airbnb.id)"
-        float avg_price_per_night "AVG(fact_airbnb.price)"
-        float avg_annual_revenue "AVG(dimRentMetrics.estimated_revenue_l365d)"
-        float avg_acceptance_rate "AVG(dimHostMetrics.host_acceptance_rate)"
-        float avg_response_rate "AVG(dimHostMetrics.host_response_rate)"
+        int total_listings "COUNT(factListing.id)"
+        float avg_price_per_night "AVG(factListing.price)"
+        float avg_annual_revenue "AVG(factListing.estimated_revenue_l365d)"
+        float avg_acceptance_rate "AVG(factListing.host_acceptance_rate)"
+        float avg_response_rate "AVG(factListing.host_response_rate)"
     }
 
     ml_premium_prediction {
@@ -75,5 +173,3 @@ erDiagram
         string host_property_type
         int host_acceptance_rate
     }
-
-    

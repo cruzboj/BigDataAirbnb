@@ -21,16 +21,12 @@ erDiagram
         list host_verifications "[email,phone,work_email]"
         bool host_has_profile_pic 
         bool host_identity_verified
-        string host_property_type
-        list host_room_type "[Entire home/apt, Private room ,Shared room]" 
+        string property_type
+        list room_type "[Entire home/apt, Private room ,Shared room]" 
     }
-
+    
     HostMetrics{
         int id PK "(FK listing_id from hostDetails)"
-
-        datetime start_date
-        datetime end_date
-        bool is_current
 
         list host_response_time "[within an hour, within a day, a few days or more , N/A]"
         float host_response_rate 
@@ -65,9 +61,6 @@ erDiagram
     RentMetrics{
         int id PK "(FK listing_id from hostDetails)"
         
-        datetime start_date
-        datetime end_date
-        bool is_current
         float price_per_night
 
         bool has_availability
@@ -124,14 +117,12 @@ erDiagram
 
         int reviewer_id 
         string reviewer_name    
-        string comments
+        string comment
         string language
         float sentiment_score
         list sentiment_label "[positive,negative,neutral]"
         int likes_count 
         datetime event_ingestion_time
-        float bot_suspicion_score 
-        int time_spent_on_review_ms 
     }
 
     Metadata {
@@ -147,7 +138,8 @@ erDiagram
         int id PK
         
         string name
-        int price_per_listing
+        string desc
+        int price_per_ad
         int n_listings
         datetime last_updated
     }
@@ -172,4 +164,3 @@ erDiagram
         string data_compliance_level "(GDPR/CCPA)"
         datetime partition_date 
     }
-    
