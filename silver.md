@@ -2,15 +2,15 @@
 
 
 erDiagram
-    fact_airbnb }|--|| dimHost : "type 0"
-    fact_airbnb ||--|| dimRentDetails : "type 0"
-    fact_airbnb ||--|| dimLocation : "type 0"
-    fact_airbnb ||--|| dimReview : "type 2 SCD"
-    fact_airbnb ||--|| dimMetadata : "type 0"
-    fact_airbnb ||--|| dimHostMetrics : "type 2 SCD"
-    fact_airbnb ||--|| dimRentMetrics : "type 2 SCD"
+    factAirbnb }|--|| dimHost : "type 0"
+    factAirbnb ||--|| dimRentDetails : "type 0"
+    factAirbnb ||--|| dimLocation : "type 0"
+    factAirbnb ||--|| dimReview : "type 2 SCD"
+    factAirbnb ||--|| dimMetadata : "type 0"
+    factAirbnb ||--|| dimHostMetrics : "type 2 SCD"
+    factAirbnb ||--|| dimRentMetrics : "type 2 SCD"
 
-    fact_airbnb{
+    factAirbnb{
         int id PK
         int host_id FK
         int rent_details_id FK

@@ -1,7 +1,7 @@
 ```mermaid
 
 erDiagram
-    DB {
+    listing {
         int id PK
         string listing_url
         string scrape_id
@@ -88,4 +88,60 @@ erDiagram
         int calculated_host_listings_count_private_rooms
         int calculated_host_listings_count_shared_rooms
         float reviews_per_month
+    }
+
+    reviews {
+        int listing_id PK
+        int id PK
+        datetime date   
+        int reviewer_id 
+        string reviewer_name    
+        string comments
+        string language
+        float sentiment_score
+        list sentiment_label "[positive,negative,neutral]"
+        int likes_votes 
+
+        timestamp event_ingestion_time
+        string raw_user_agent 
+        float bot_suspicion_score 
+        string reviewer_hash_id 
+        string aspect_sentiment_json 
+        string extracted_keywords s
+        int comment_character_count 
+        float readability_index 
+        string session_id 
+        int time_spent_on_review_ms 
+        bool contains_media
+    }
+
+    adsProviders{
+        int id PK
+        string name
+        int price
+        int n_listings
+        datetime last_updated
+        float avg_conversion_rate
+        int post_amount
+        
+        long total_impressions
+        long total_clicks
+        float ctr
+        float total_ad_spend
+        float return_on_investment
+        string target_demographics
+        string region_coverage
+        float reliability_score
+
+        string api_endpoint_latency
+        float churn_rate_provider 
+        float avg_cpc "(Cost Per Click)"
+        float avg_cpm "(Cost Per Mille)"
+        string audience_interest_tags
+        float fraud_traffic_percent 
+        string attribution_window 
+        int concurrent_campaigns_count
+        float market_share_percentage 
+        string data_compliance_level "(GDPR/CCPA)"
+        timestamp partition_date 
     }
