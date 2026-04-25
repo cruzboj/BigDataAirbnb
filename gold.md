@@ -115,7 +115,7 @@ erDiagram
       datetime partition_date 
     }
 
-    SummaryNeighbourhoodInvest{
+    AggNeighbourhoodInvest{
         string city_name 
         string neighbourhood_name
         int neighbourhood_most_views
@@ -129,7 +129,7 @@ erDiagram
         float avg_response_rate
     }
     
-    SummaryAds{
+    AggAds{
         int provider_id PK
         string provider_name
 
@@ -144,7 +144,7 @@ erDiagram
     }
 
 
-    SummaryNeighborhoodPerformance {
+    AggNeighborhoodPerformance {
         string neighbourhood PK "Grouped by dimLocation.neighbourhood"
         
         int total_active_listings "COUNT(factListing.id)"
@@ -155,7 +155,7 @@ erDiagram
         int total_reviews_ltm "SUM(factReview.number_of_reviews_ltm) - indicates current hype"
     }
 
-    SummaryHostEconomics {
+    AggHostEconomics {
         string room_type PK 
         
         int total_listings "COUNT(factListing.id)"
@@ -165,11 +165,26 @@ erDiagram
         float avg_response_rate "AVG(factListing.host_response_rate)"
     }
 
-    ml_premium_prediction {
-        float price
-        int availability_30
-        int estimated_revenue_l365d
-        list amenities
-        string host_property_type
-        int host_acceptance_rate
+    %% MACHINE LEARNING REQUIREMENTS
+    %% 1. Business Problem: Predict if a listing can command a "Premium Price" (Top 20% in its neighborhood) based on property features, availability, and host reputation.
+    %% 2. Feature Table: ml_feature_premium_pricing
+
+    ml_feature_premium_pricing {
+        int listing_key FK 
+        int property_key FK 
+        int location_key FK 
+        int host_key FK 
+        
+        %% Features (X)
+        string property_type "From dimProperty"
+        int accommodates "From dimProperty"
+        int bedrooms "From dimProperty"
+        int amenities_count "Derived: Count of items in dimProperty.amenities"
+        int availability_30 "From factListing"
+        float host_acceptance_rate "From factListing"
+        string response_time_category "From dimHost"
+        float avg_review_scores_rating "Aggregated from AggNeighborhoodPerformance"
+        
+        %% Target Variable / Label (Y)
+        bool is_premium_target "Label: 1 if price > 80th percentile of location, else 0"
     }
