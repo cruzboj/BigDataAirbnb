@@ -7,7 +7,6 @@ erDiagram
      factListing ||--|| dimLocation : "type 0"
      factListing }o--|| dimHost: "type 2"
      factListing ||--|| dimProperty: "type 2"
-     factReview ||--|| dimReviewer: "type 0"
      factReview }o--|| dimHost: "type 2"
      factReview ||--|| dimLocation : "type 0"
      factReview ||--|| dimProperty: "type 2"
@@ -27,6 +26,8 @@ erDiagram
       int estimated_revenue_l365d
       float host_response_rate 
       int host_acceptance_rate
+
+      datetime ingestion_ts
     }
     
     dimProperty{
@@ -40,6 +41,8 @@ erDiagram
       int beds
       list ameneties
       int accommodates
+
+      datetime ingestion_ts
     }
     
     dimLocation{
@@ -49,6 +52,11 @@ erDiagram
       location latitude
       location longitude
       string host_neighbourhood 
+
+      string country
+      string city
+
+      datetime ingestion_ts
     }
     
     dimHost {
@@ -59,6 +67,8 @@ erDiagram
       bool is_current
       string name
       string response_time_category
+
+      datetime ingestion_ts
     }
     
     factReview{
@@ -67,21 +77,16 @@ erDiagram
       int location_key FK
       int host_key FK
      
-     string comment
-     string language
-     int like_count 
-     float sentiment_score
-     float review_scores_rating
-     float review_scores_accuracy
-     float review_scores_cleanliness
-     int number_of_reviews_ltm
- 
-    }
-    
-    dimReviewer{
-      int reviewer_key
-      int number_of_reviews
-      string reviewer_name    
+      string comment
+      string language
+      int like_count 
+      float sentiment_score
+      float review_scores_rating
+      float review_scores_accuracy
+      float review_scores_cleanliness
+      int number_of_reviews_ltm
+
+      datetime ingestion_ts
     }
     
     dimProvider{
@@ -92,6 +97,8 @@ erDiagram
       bool is_current
       string name
       string desc
+
+      datetime ingestion_ts
     }
     
     factAd{
@@ -113,6 +120,8 @@ erDiagram
       int campaigns_count
       string data_compliance_level "(GDPR/CCPA)"
       datetime partition_date 
+
+      datetime ingestion_ts
     }
 
     AggNeighbourhoodInvest{
@@ -127,6 +136,8 @@ erDiagram
         float avg_review_score
         float median_availability
         float avg_response_rate
+
+        date ingestion_ts
     }
     
     AggAds{
@@ -141,6 +152,8 @@ erDiagram
         int customer_gained
         float conversion_rate
         int new_customers_l30d_pct 
+
+        datetime ingestion_ts
     }
 
 
@@ -153,6 +166,8 @@ erDiagram
         float avg_occupancy_rate "AVG(factListing.estimated_occupancy_l365d)"
         float avg_review_score "AVG(factReview.review_scores_rating)"
         int total_reviews_ltm "SUM(factReview.number_of_reviews_ltm) - indicates current hype"
+
+        datetime ingestion_ts
     }
 
     AggHostEconomics {
@@ -163,6 +178,8 @@ erDiagram
         float avg_annual_revenue "AVG(factListing.estimated_revenue_l365d)"
         float avg_acceptance_rate "AVG(factListing.host_acceptance_rate)"
         float avg_response_rate "AVG(factListing.host_response_rate)"
+
+        datetime ingestion_ts
     }
 
     %% MACHINE LEARNING REQUIREMENTS
@@ -187,4 +204,6 @@ erDiagram
         
         %% Target Variable / Label (Y)
         bool is_premium_target "Label: 1 if price > 80th percentile of location, else 0"
+
+        datetime ingestion_ts
     }

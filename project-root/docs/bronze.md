@@ -88,6 +88,10 @@ erDiagram
         int calculated_host_listings_count_private_rooms
         int calculated_host_listings_count_shared_rooms
         float reviews_per_month
+
+        string country
+        string city
+        datetime ingestion_ts
     }
 
     reviews {
@@ -113,6 +117,8 @@ erDiagram
         string session_id 
         int time_spent_on_review_ms 
         bool contains_media
+
+        datetime ingestion_ts
     }
 
     adsProviders{
@@ -144,4 +150,6 @@ erDiagram
         float market_share_percentage 
         string data_compliance_level "(GDPR/CCPA)"
         timestamp partition_date 
+
+        datetime ingestion_ts
     }

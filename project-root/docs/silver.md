@@ -23,6 +23,8 @@ erDiagram
         bool host_identity_verified
         string property_type
         list room_type "[Entire home/apt, Private room ,Shared room]" 
+
+        datetime ingestion_ts
     }
     
     HostMetrics{
@@ -36,6 +38,8 @@ erDiagram
         int hosts_time_as_host_years
         int hosts_time_as_user_years
         int hosts_time_as_user_months
+
+        datetime ingestion_ts
     }
 
     RentDetails{
@@ -56,6 +60,8 @@ erDiagram
         int minimum_nights_avg_ntm
         int maximum_nights_avg_ntm
         string license
+
+        datetime ingestion_ts
     }
 
     RentMetrics{
@@ -76,11 +82,16 @@ erDiagram
         int calculated_host_listings_count_entire_homes
         int calculated_host_listings_count_private_rooms
         int calculated_host_listings_count_shared_rooms
+        
+        datetime ingestion_ts
     }
 
     Location{
         int id PK "(FK listing_id from hostDetails)"
-
+        
+        string country
+        string city
+        
         string listing_url
         string name
         string description
@@ -90,6 +101,8 @@ erDiagram
         location latitude
         location longitude
         string host_neighbourhood 
+
+        datetime ingestion_ts
     }
 
     Review{
@@ -122,7 +135,8 @@ erDiagram
         float sentiment_score
         list sentiment_label "[positive,negative,neutral]"
         int likes_count 
-        datetime event_ingestion_time
+
+        datetime ingestion_ts
     }
 
     Metadata {
@@ -132,6 +146,8 @@ erDiagram
         string scrape_id
         datetime last_scraped
         datetime calendar_last_scraped
+
+        datetime ingestion_ts
     }
 
     providerDetails{
@@ -142,6 +158,8 @@ erDiagram
         int price_per_ad
         int n_listings
         datetime last_updated
+
+        datetime ingestion_ts
     }
 
     providerMetrics{
@@ -163,4 +181,6 @@ erDiagram
         int campaigns_count
         string data_compliance_level "(GDPR/CCPA)"
         datetime partition_date 
+
+        datetime ingestion_ts
     }
