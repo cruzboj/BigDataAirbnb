@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 import csv
 import json
@@ -11,7 +11,7 @@ from avro_schemas import review_avro_schema
 #.env
 KAFKA_BROKER = 'localhost:29092'
 SCHEMA_REGISTRY_URL = 'http://localhost:8082'
-CSV_FILE_PATH = 'reviews_enriched.csv' 
+CSV_FILE_PATH = '../reviews_enriched.csv' 
 TOPIC_NAME = 'airbnb_reviews'
 
 # TODO : kafka paroducer class, modules constent config.py, devide function to subfunctions, methods,
