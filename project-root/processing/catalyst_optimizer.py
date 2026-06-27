@@ -17,26 +17,30 @@ from define_dataframe import create_dataframe_batch , create_dataframe_streaming
     
     use .explain() to see the plan and check if it is optimized or not
 """
+class catalystOptimizer:
+    def __init__(self,app_name):
+        self.app_name = app_name
 
-def create_spark_session(app_name):
-    """
-    """
-    if app_name is None:
-        raise ValueError("App name cannot be None")
+    def create_spark_session(self,type):
+        """
+            
+        """
+        if type is None:
+            raise ValueError("App name cannot be None")
+            
+        spark = SparkSession.builder.appName(self.app_name).getOrCreate()
         
-    spark = SparkSession.builder.appName(app_name).getOrCreate()
-
-    #define_data.py
-    df_batch = create_dataframe_batch(spark)
-    df_stream = create_dataframe_streaming(spark)
-    df_late_arrivals = create_dataframe_late_arrivals(spark)
-
-    return df_batch
+        #define_data.py
+        if type == "batch":
+            df_batch = create_dataframe_batch(spark)
+            return df_batch
+        df_stream = create_dataframe_streaming(spark)
+        df_late_arrivals = create_dataframe_late_arrivals(spark)
 
 
 def main():
-    df = create_spark_session("Catalyst_Optimizer_Test")
-
+    c_o = catalystOptimizer("Catalyst_Optimizer_Test")
+    df = c_o.create_spark_session("batch")
     print("Loading datasets...")
     print("--- Batch DataFrame Top 10 Rows ---")
     df.filter(col("city") == "denmark").select("id", "name", "price", "city", "ingestion_ts").show(5)

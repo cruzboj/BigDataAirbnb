@@ -39,14 +39,6 @@ def create_dataframe_batch(spark):
         from pyspark.sql import DataFrame
         
         df = reduce(DataFrame.unionByName, dataframes)
-    # df = spark.read \
-    #     .format("csv") \
-    #     .option("columnNameOfCorruptRecord", "_corrupt_record") \
-    #     .option("header", "true") \
-    #     .option("inferSchema", "true") \
-    #     .option("quote", "\"") \
-    #     .option("escape", "\"") \
-    #     .load(CSV_FILE_PATH2)
     
     return df
 
