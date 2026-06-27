@@ -114,5 +114,4 @@ if __name__ == "__main__":
         registry_url=SCHEMA_REGISTRY_URL
     )
     
-    # הפעלת הזרם
     streamer.stream_reviews()

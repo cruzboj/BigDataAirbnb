@@ -1,15 +1,15 @@
 from confluent_kafka import DeserializingConsumer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
-
-# ייבוא הסכמה
 from avro_schemas import review_avro_schema
 
 # --- הגדרות ---
 KAFKA_BROKER = 'localhost:29092'
 SCHEMA_REGISTRY_URL = 'http://localhost:8082'
 TOPIC_NAME = 'airbnb_reviews'
-GROUP_ID = 'my_test_group_1' # קבוצת צרכנים לבדיקה
+GROUP_ID = 'my_test_group_1'
+
+
 
 def main():
     # 1. חיבור ל-Schema Registry והגדרת ה-Deserializer (המפענח)
