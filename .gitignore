@@ -1,7 +1,14 @@
+.git/
 *.json
 *.csv
-.venv
+
 *.pyc
 *.pyo
 *.pyd
+
+.venv/
 __pycache__/
+*.pyc
+
+logs/
+*.log

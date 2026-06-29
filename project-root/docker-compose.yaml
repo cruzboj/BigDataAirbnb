@@ -26,6 +26,8 @@ services:
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
       - AWS_REGION=us-east-1
+      - KAFKA_BROKER=kafka:9092
+      - SCHEMA_REGISTRY_URL=http://schema-registry:8081
     ports:
       - 8888:8888
       - 8080:8080
@@ -171,5 +173,4 @@ networks:
 
 volumes:
   postgres_data:
-
 

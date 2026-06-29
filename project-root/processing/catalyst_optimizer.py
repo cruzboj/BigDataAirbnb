@@ -21,20 +21,23 @@ class catalystOptimizer:
     def __init__(self,app_name):
         self.app_name = app_name
 
-    def create_spark_session(self,type):
+    def create_spark_session(self,set_type):
         """
             
         """
-        if type is None:
+        if set_type is None:
             raise ValueError("App name cannot be None")
             
         spark = SparkSession.builder.appName(self.app_name).getOrCreate()
         
         #define_data.py
-        if type == "batch":
+        if set_type == "batch":
             df_batch = create_dataframe_batch(spark)
             return df_batch
-        df_stream = create_dataframe_streaming(spark)
+        elif set_type == "streaming":
+            df_stream = create_dataframe_streaming(spark)
+            return df_stream
+        
         df_late_arrivals = create_dataframe_late_arrivals(spark)
 
 

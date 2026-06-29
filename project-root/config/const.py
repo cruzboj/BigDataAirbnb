@@ -1,15 +1,15 @@
-#kafka configuration
-KAFKA_BROKER = 'localhost:29092'
-SCHEMA_REGISTRY_URL = 'http://localhost:8082'
-CSV_FILE_PATH = '../csv_folder/reviews.csv' 
-TOPIC_NAME = 'airbnb_reviews'
+import os
 
-#spark configuration
+# Kafka configuration
+#TODO: change the localhost into a container location , "kafka:29092" "http://schema-registry:8082"
+
+KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:29092")
+SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://localhost:8082")
+KAFKA_PATH = "./data/raw/reviews.csv"
+TOPIC_NAME = "airbnb_reviews"
+
+# Spark configuration
 LISTINGS_PATH = [
-    '../csv_folder/listings_denmark.csv.gz' ,
-    '../csv_folder/listings_chicago.csv.gz',
-    ]
-
-
-CSV_FILE_PATH2 = '../csv_folder/listings_denmark.csv'
-CSV_FILE_PATH3 = '../csv_folder/listings_chicago.csv.gz'
+    "./data/raw/listings_denmark.csv.gz",
+    "./data/raw/listings_chicago.csv.gz",
+]
