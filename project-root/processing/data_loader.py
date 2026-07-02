@@ -21,25 +21,33 @@ class DataLoader:
     def __init__(self,app_name):
         self.app_name = app_name
 
-    def create_dataframe(self,set_type):
+    def create_spark_session(self):
+        """
+            Creates a SparkSession with the necessary S3A dependencies for MinIO.
+        """
+        self.spark = SparkSession.builder.appName(self.app_name)\
+        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262") \
+        .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
+        .config("spark.hadoop.fs.s3a.access.key", "admin") \
+        .config("spark.hadoop.fs.s3a.secret.key", "password") \
+        .config("spark.hadoop.fs.s3a.path.style.access", "true") \
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
+        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+        .getOrCreate()
+        return self.spark
+        
+    def create_dataframe(self):
         """
             
         """
-        if set_type is None:
-            raise ValueError("App name cannot be None")
-            
-        spark = SparkSession.builder.appName(self.app_name).getOrCreate()
         
         #define_data.py
-        if set_type == "batch":
-            df_batch = create_dataframe_batch(spark)
-            return df_batch
-        elif set_type == "streaming":
-            df_stream = create_dataframe_streaming(spark)
-            return df_stream
-        
-        df_late_arrivals = create_dataframe_late_arrivals(spark)
-
+        df_batch = create_dataframe_batch(self.spark)
+        # df_stream = create_dataframe_streaming(self.spark)
+        # df_late_arrivals = create_dataframe_late_arrivals(self.spark)
+        return df_batch
 
 def main():
     c_o = DataLoader("Catalyst_Optimizer_Test")
