@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType , DoubleType , IntegerType
 from pyspark.sql.functions import col,to_timestamp,expr
 
-from define_dataframe import create_dataframe_batch , create_dataframe_streaming ,create_dataframe_late_arrivals
+from dataframe import create_dataframe_batch , create_dataframe_streaming ,create_dataframe_late_arrivals
 """
     #TODO :
         1.unresolved logical plan (parsed: make sure it wont spit garbage)
@@ -17,11 +17,11 @@ from define_dataframe import create_dataframe_batch , create_dataframe_streaming
     
     use .explain() to see the plan and check if it is optimized or not
 """
-class catalystOptimizer:
+class DataLoader:
     def __init__(self,app_name):
         self.app_name = app_name
 
-    def create_spark_session(self,set_type):
+    def create_dataframe(self,set_type):
         """
             
         """
@@ -42,11 +42,12 @@ class catalystOptimizer:
 
 
 def main():
-    c_o = catalystOptimizer("Catalyst_Optimizer_Test")
-    df = c_o.create_spark_session("batch")
+    c_o = DataLoader("Catalyst_Optimizer_Test")
+    df = c_o.create_dataframe("batch")
     print("Loading datasets...")
     print("--- Batch DataFrame Top 10 Rows ---")
     df.filter(col("city") == "denmark").select("id", "name", "price", "city", "ingestion_ts").show(5)
     df.filter(col("city") == "chicago").select("id", "name", "price" , "city", "ingestion_ts").show(5)
+    
 if __name__ == '__main__':
     main()

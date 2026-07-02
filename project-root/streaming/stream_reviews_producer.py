@@ -11,7 +11,7 @@ import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
-from config.const import KAFKA_BROKER, SCHEMA_REGISTRY_URL, CSV_FILE_PATH, TOPIC_NAME
+from config.const import KAFKA_BROKER, SCHEMA_REGISTRY_URL, KAFKA_PATH, TOPIC_NAME
 
 def delivery_report(err, msg):
     if err is not None:
@@ -109,7 +109,7 @@ class ReviewStreamReader:
 if __name__ == "__main__":
     print("Initializing Kafka Producer...")
     streamer = ReviewStreamReader(
-        data_file=CSV_FILE_PATH,
+        data_file=KAFKA_PATH,
         broker=KAFKA_BROKER,
         registry_url=SCHEMA_REGISTRY_URL
     )
