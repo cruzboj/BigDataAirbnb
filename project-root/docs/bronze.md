@@ -24,7 +24,7 @@ erDiagram
         int hosts_time_as_host_years
         string host_location 
         string host_about
-        list host_response_time "[within an hour, within a day, a few days or more , N/A]"
+        string host_response_time "[within an hour, within a day, a few days or more , N/A]"
         float host_response_rate
         int host_acceptance_rate
         bool host_is_superhost

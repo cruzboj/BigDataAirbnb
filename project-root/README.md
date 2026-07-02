@@ -2,6 +2,10 @@ setup instructions -
     working with .gz format insted of csv
     CSV | GZ files must be in csv_folder
 
+
+run python3 with modules:
+uv run -m <module>.<filename_only_without_suffix>
+
 uv:
     .venv\Scripts\activate
 

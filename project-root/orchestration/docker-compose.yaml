@@ -3,7 +3,7 @@ x-airflow-common: &airflow-common
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow_password@postgres/airflow
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false' 
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
@@ -20,16 +20,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  airflow-init:
-    <<: *airflow-common
-    container_name: airflow_init
-    depends_on:
-      postgres:
-        condition: service_started
-    command: >
-      bash -c "airflow db migrate && 
-      airflow users create --username admin --password admin --firstname Rani --lastname Boss --role Admin --email admin@example.com"
-
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow_webserver
@@ -39,9 +29,7 @@ services:
     depends_on:
       postgres:
         condition: service_started
-      airflow-init:
-        condition: service_completed_successfully
-  
+
   airflow-scheduler:
     <<: *airflow-common
     container_name: airflow_scheduler
@@ -49,5 +37,3 @@ services:
     depends_on:
       postgres:
         condition: service_started
-      airflow-init:
-        condition: service_completed_successfully
