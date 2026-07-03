@@ -1,13 +1,10 @@
+from processing.const import (
+    bronze_bucket,
+    gold_bucket,
+    silver_bucket,
+)
 from processing.data_loader import DataLoader
-
-"""
-    TODO: make 3 buckets (brozne,silver,gold)
-"""
-
-bronze_bucket = "bronze-bucket"
-silver_bucket = "silver-bucket"
-gold_bucket = "gold-bucket"
-
+from processing.s3 import S3StorageHandler
 
 data_loader = DataLoader("airbnb")
 spark = data_loader.create_spark_session()
@@ -27,9 +24,11 @@ spark = data_loader.create_spark_session()
 # check_df = spark.read.parquet(output_path)
 # check_df.show(truncate=False)
 
-data_loader.load_batch()
-# TODO: initialize buckets - bronze, silver, gold from the minio SDK
-# TODO: take loaded batch data and insert it into minio s3 storage
+batches = data_loader.load_batch()
+storage = S3StorageHandler(spark)
+storage.create_buckets([bronze_bucket, silver_bucket, gold_bucket])
+for i, batch in enumerate(batches):
+    storage.bucket_upload(bronze_bucket, f"test_file-{i}.parquet", batch)
 
 
 spark.stop()
