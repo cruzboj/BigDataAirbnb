@@ -4,7 +4,7 @@ from processing.const import (
     silver_bucket,
 )
 from processing.data_loader import DataLoader
-from processing.s3 import S3StorageHandler
+from processing.storage.s3 import S3StorageHandler
 
 data_loader = DataLoader("airbnb")
 spark = data_loader.create_spark_session()
@@ -16,7 +16,7 @@ spark = data_loader.create_spark_session()
 # ]
 
 # sample_df = spark.createDataFrame(sample_rows, ["id", "city", "price"])
-# output_path = MINIO_PATH + f"{bronze_bucket}/sample.parquet"
+# output_path = f"s3a://{bronze_bucket}/sample.parquet"
 
 # sample_df.write.mode("overwrite").parquet(output_path)
 # print(f"Wrote sample parquet to: {output_path}")
@@ -30,5 +30,7 @@ storage.create_buckets([bronze_bucket, silver_bucket, gold_bucket])
 for i, batch in enumerate(batches):
     storage.bucket_upload(bronze_bucket, f"test_file-{i}.parquet", batch)
 
+df = storage.read_file(f"s3a://{bronze_bucket}/test_file-0.parquet")
+df.show(truncate=False)
 
 spark.stop()
