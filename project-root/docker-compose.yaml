@@ -1,7 +1,7 @@
 include:
-  - processing/docker-compose.yaml
-  - streaming/docker-compose.yaml
-  - orchestration/docker-compose.yaml
+  - processing/processing-docker-compose.yaml
+  - streaming/streaming-docker-compose.yaml
+  - orchestration/orchestration-docker-compose.yaml
 
 networks:
   iceberg_net:

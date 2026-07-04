@@ -9,6 +9,8 @@ uv run -m <module>.<filename_only_without_suffix>
 uv:
     .venv\Scripts\activate
 
+    source .venv/bin/activate
+
 run migrate: 
 docker exec -w /home/iceberg/processing spark-iceberg python migrate_schema.py
 
