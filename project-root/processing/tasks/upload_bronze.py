@@ -12,7 +12,6 @@ with SparkSessionManager("airbnb") as spark:
     batches = data_loader.load_batch()
 
     storage = S3StorageHandler(spark)
-    storage.create_buckets([bronze_bucket, silver_bucket, gold_bucket])
     for i, batch in enumerate(batches):
         storage.bucket_upload(bronze_bucket, f"test_file-{i}.parquet", batch)
 
