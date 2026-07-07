@@ -11,6 +11,9 @@ uv:
 
     source .venv/bin/activate
 
+manual user create:
+docker exec -it airflow_webserver airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
+
 run migrate: 
 docker exec -w /home/iceberg/processing spark-iceberg python migrate_schema.py
 

@@ -17,7 +17,5 @@ with SparkSessionManager("airbnb") as spark:
         storage.bucket_upload(bronze_bucket, f"test_file-{i}.parquet", batch)
 
     df = storage.read_file(f"s3a://{bronze_bucket}/test_file-0.parquet")
-    df.show(truncate=False)
+    df.show(1)
 
-if __name__ == "__main__":
-    initialize_buckets()

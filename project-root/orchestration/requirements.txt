@@ -1,0 +1,14 @@
+# Extra Python dependencies for Airflow DAG runtime (Airflow core comes from the base image).
+apache-airflow-providers-apache-spark
+attrs
+authlib
+cachetools
+certifi
+confluent-kafka
+fastavro
+httpx
+minio
+pyspark
+requests
+
+scikit-learn

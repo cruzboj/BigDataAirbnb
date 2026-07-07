@@ -5,14 +5,15 @@ from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOpe
     schedule=None,
     catchup=False,
 )
-def my_dag():
+def spark_dag():
 
-    read_data = SparkSubmitOperator(
-        task_id='read_data',
-        application="/opt/airflow/processing/read.py",
+    write_data = SparkSubmitOperator(
+        task_id='write_data_to_minio',
+        application="/opt/airflow/processing/minio_connector.py",
         conn_id="my_spark_conn",
+        packages="org.apache.hadoop:hadoop-aws:3.4.1,com.amazonaws:aws-java-sdk-bundle:1.12.367",
         env_vars={"PYTHONPATH": "/opt/airflow"},
         verbose=True
     )
 
-my_dag()
+spark_dag()
