@@ -18,10 +18,7 @@ erDiagram
         string host_profile_url
         string host_name
         string host_since
-        int hosts_time_as_user_years
-        int hosts_time_as_user_months
-        int hosts_time_as_host_months
-        int hosts_time_as_host_years
+
         string host_location 
         string host_about
         string host_response_time "[within an hour, within a day, a few days or more , N/A]"

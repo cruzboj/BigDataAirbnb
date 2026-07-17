@@ -194,7 +194,7 @@ silver_host_details_schema = StructType(
         field("host_has_profile_pic", BooleanType()),
         field("host_identity_verified", BooleanType()),
         field("property_type", StringType()),
-        field("room_type", STRING_ARRAY),
+        field("room_type", StringType()),
         field("ingestion_ts", TimestampType()),
     ]
 )
@@ -203,13 +203,10 @@ silver_host_details_schema = StructType(
 silver_host_metrics_schema = StructType(
     [
         field("id", IntegerType()),
-        field("host_response_time", STRING_ARRAY),
+        field("host_response_time", StringType()),
         field("host_response_rate", FloatType()),
         field("host_acceptance_rate", IntegerType()),
-        field("hosts_time_as_host_months", IntegerType()),
-        field("hosts_time_as_host_years", IntegerType()),
-        field("hosts_time_as_user_years", IntegerType()),
-        field("hosts_time_as_user_months", IntegerType()),
+
         field("ingestion_ts", TimestampType()),
     ]
 )
@@ -382,7 +379,7 @@ gold_dim_property_schema = StructType(
         field("end_date", TimestampType()),
         field("is_current", BooleanType()),
         field("property_key", IntegerType()),
-        field("room_type", STRING_ARRAY),
+        field("room_type", StringType()),
         field("property_type", StringType()),
         field("bedrooms", IntegerType()),
         field("beds", IntegerType()),

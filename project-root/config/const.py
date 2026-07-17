@@ -8,6 +8,6 @@ REVIEWS_PATH = "./data/raw/reviews.csv"
 TOPIC_NAME = "airbnb_reviews"
 
 LISTINGS_PATH = [
-    "./data/raw/listings_denmark.csv.gz",
-    "./data/raw/listings_chicago.csv.gz",
+    "./data/raw/listings_copenhagen_denmark.csv.gz",
+    "./data/raw/listings_chicago_usa.csv.gz",
 ]

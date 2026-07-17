@@ -33,5 +33,5 @@ class S3StorageHandler:
     def bucket_upload(self, bucket: str, filename: str, dataframe: DataFrame):
         dataframe.write.mode("overwrite").parquet(f"s3a://{bucket}/{filename}")
 
-    def read_file(self, file_path: str) -> DataFrame:
+    def read_files(self, file_path: str) -> DataFrame:
         return self.spark.read.parquet(file_path)

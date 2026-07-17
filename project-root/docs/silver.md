@@ -34,11 +34,6 @@ erDiagram
         float host_response_rate 
         int host_acceptance_rate
 
-        int hosts_time_as_host_months
-        int hosts_time_as_host_years
-        int hosts_time_as_user_years
-        int hosts_time_as_user_months
-
         datetime ingestion_ts
     }
 
