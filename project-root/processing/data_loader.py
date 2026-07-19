@@ -1,23 +1,41 @@
-from pyspark.sql import SparkSession
+from collections.abc import Iterable
+
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     current_timestamp,
+    element_at,
     input_file_name,
+    lit,
     regexp_extract,
+    regexp_replace,
+    size,
+    split,
+    when,
 )
+from pyspark.sql.types import StructType
 
-from config.const import LISTINGS_PATH
-from processing.schema import bronze_listing_schema, format_schema, parse_array_columns                  
+from processing.schema import format_schema, parse_array_columns
+
+
 class DataLoader:
     def __init__(self, app_name: str, spark: SparkSession):
         self.app_name = app_name
         self.spark = spark
 
-    def load_batch(self,target_schema):
+    def load_batch(
+        self, target_schema: StructType, file_paths: str | Iterable[str] | None = None
+    ) -> list[DataFrame]:
         schema = format_schema(target_schema)
 
-        data = []
+        if file_paths is None:
+            raise ValueError("file_paths is required")
 
-        for path in LISTINGS_PATH:
+        paths = [file_paths] if isinstance(file_paths, str) else list(file_paths)
+        if not paths:
+            raise ValueError("file_paths cannot be empty")
+
+        dataframes: list[DataFrame] = []
+        for path in paths:
             df = (
                 self.spark.read.schema(schema)
                 .option("header", "true")
@@ -25,23 +43,24 @@ class DataLoader:
                 .option("quote", '"')
                 .option("escape", '"')
                 .csv(path)
-
             )
 
-            if target_schema == bronze_listing_schema:
-                filename = input_file_name()
-                city = regexp_extract(filename, r"listings_([a-zA-Z]+)_", 1)
-                country = regexp_extract(filename, r"listings_[a-zA-Z]+_([a-zA-Z]+)", 1)
-                df = df.withColumn("filename", filename)
-                df = df.withColumn("city", city)
-                df = df.withColumn("country", country)
+            filename = input_file_name()
+            basename = regexp_extract(filename, r"([^/]+)$", 1)
+            stem = regexp_replace(basename, r"(\.[^./]+)+$", "")
+            parts = split(stem, "_")
 
+            city = when(size(parts) >= 2, element_at(parts, -2)).otherwise(lit(None))
+            country = when(size(parts) >= 2, element_at(parts, -1)).otherwise(lit(None))
 
-            df = parse_array_columns(df, target_schema)
+            enriched_df = (
+                df.withColumn("filename", filename)
+                .withColumn("city", city)
+                .withColumn("country", country)
+            )
+            enriched_df = parse_array_columns(enriched_df, target_schema)
+            enriched_df = enriched_df.withColumn("ingestion_ts", current_timestamp())
 
-            df = df.withColumn("ingestion_ts", current_timestamp())
-            
+            dataframes.append(enriched_df)
 
-            data.append(df)
-
-        return data
+        return dataframes

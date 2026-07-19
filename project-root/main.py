@@ -1,5 +1,5 @@
-def main():
-    print("Hello from project-root!")
+def main() -> None:
+    print("Hello World!")
 
 
 if __name__ == "__main__":

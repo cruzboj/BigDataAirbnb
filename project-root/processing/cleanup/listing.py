@@ -1,4 +1,5 @@
 from pyspark.sql import DataFrame
+from pyspark.sql.column import Column
 from pyspark.sql.functions import (
     coalesce,
     col,
@@ -69,7 +70,7 @@ class ListingProcessor:
             .df
         )
 
-    def validate_cleaned_data(self):
+    def validate_cleaned_data(self) -> None:
         """Validate cleaned listing data and print a sample of cleaned columns."""
         total_rows = self.df.count()
         print(f"\n=== Validation: total rows = {total_rows} ===")
@@ -176,8 +177,10 @@ class ListingProcessor:
 
     @staticmethod
     def _safe_to_double(
-        column_name: str, remove_pattern: str | None = None, default=None
-    ):
+        column_name: str,
+        remove_pattern: str | None = None,
+        default: float | None = None,
+    ) -> Column:
         value = trim(col(column_name).cast("string"))
         if remove_pattern:
             value = trim(regexp_replace(value, remove_pattern, ""))
@@ -192,7 +195,11 @@ class ListingProcessor:
         return parsed
 
     @staticmethod
-    def _safe_to_int(column_name: str, remove_pattern: str | None = None, default=None):
+    def _safe_to_int(
+        column_name: str,
+        remove_pattern: str | None = None,
+        default: int | None = None,
+    ) -> Column:
         value = trim(col(column_name).cast("string"))
         if remove_pattern:
             value = trim(regexp_replace(value, remove_pattern, ""))
@@ -207,7 +214,7 @@ class ListingProcessor:
         return parsed
 
     @staticmethod
-    def _parse_tf_bool(column_name: str):
+    def _parse_tf_bool(column_name: str) -> Column:
         value = lower(trim(col(column_name).cast("string")))
         return (
             when(value.isin("t", "true", "1", "yes", "y"), lit(True))

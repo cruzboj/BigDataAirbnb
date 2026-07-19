@@ -1,3 +1,5 @@
+from types import TracebackType
+
 from pyspark.sql import SparkSession
 
 from processing.const import MINIO_ACCESS_KEY, MINIO_ENDPOINT, MINIO_SECRET_KEY
@@ -32,7 +34,12 @@ class SparkSessionManager:
         )
         return self.spark
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         if self.spark is not None:
             self.spark.stop()
             self.spark = None

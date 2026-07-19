@@ -1,15 +1,26 @@
+import logging
+from collections.abc import Mapping
+
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
+from pyspark.sql.types import StructType
 
 from processing.cleanup.listing import ListingProcessor
-from processing.const import bronze_bucket, silver_bucket
+from processing.const import BRONZE_BUCKET, SILVER_BUCKET
 from processing.schema import SILVER_SCHEMAS
 from processing.session import SparkSessionManager
 from processing.storage.s3 import S3StorageHandler
 
+logger = logging.getLogger("airbnb.processing.tasks.bronze_to_silver")
 
-def process_silver_tables(bronze_df, silver_schemas, storage_handler, silver_bucket):
+
+def process_silver_tables(
+    bronze_df: DataFrame,
+    silver_schemas: Mapping[str, StructType],
+    storage_handler: S3StorageHandler,
+    silver_bucket: str,
+) -> None:
     """Cast cleaned bronze data into each silver schema and upload parquet files."""
-
     column_mapping = {
         "listing_id": "id",
         "host_profile_id": "host_id",
@@ -28,21 +39,22 @@ def process_silver_tables(bronze_df, silver_schemas, storage_handler, silver_buc
     }
 
     available_columns = set(bronze_df.columns)
-    succeeded = []
-    failed = []
+    succeeded: list[str] = []
+    failed: list[str] = []
 
     for table_name, schema in silver_schemas.items():
-        print(f"Loading data using schema {table_name}")
+        logger.info("Loading data using schema %s", table_name)
 
         try:
-            source_columns = []
+            source_columns: list[str] = []
             cast_exprs = []
             for field in schema:
                 target_col_name = field.name
                 source_col_name = column_mapping.get(target_col_name, target_col_name)
                 source_columns.append(source_col_name)
-                expr = col(source_col_name).cast(field.dataType).alias(target_col_name)
-                cast_exprs.append(expr)
+                cast_exprs.append(
+                    col(source_col_name).cast(field.dataType).alias(target_col_name)
+                )
 
             missing_columns = sorted(
                 {
@@ -59,34 +71,43 @@ def process_silver_tables(bronze_df, silver_schemas, storage_handler, silver_buc
             silver_df = bronze_df.select(*cast_exprs)
 
             if table_name in natural_keys:
-                key_columns = natural_keys[table_name]
-                silver_df = silver_df.dropDuplicates(key_columns)
+                silver_df = silver_df.dropDuplicates(natural_keys[table_name])
 
             output_path = f"{table_name}.parquet"
             storage_handler.bucket_upload(silver_bucket, output_path, silver_df)
-            print(
-                f"Successfully uploaded {table_name} to s3a://{silver_bucket}/{output_path}"
+            logger.info(
+                "Successfully uploaded %s to s3a://%s/%s",
+                table_name,
+                silver_bucket,
+                output_path,
             )
             succeeded.append(table_name)
 
-        except Exception as exc:
-            print(
-                f"[SCHEMA_SKIP] Failed to apply schema '{table_name}'. "
-                f"Skipping upload for this table. Error: {exc}"
+        except Exception as exc:  # noqa: BLE001 - task should continue per schema
+            logger.warning(
+                "[SCHEMA_SKIP] Failed to apply schema '%s'. Skipping upload. Error: %s",
+                table_name,
+                exc,
             )
             failed.append(table_name)
 
-    print("\n=== Silver schema processing summary ===")
-    print(f"Succeeded schemas ({len(succeeded)}): {succeeded}")
-    print(f"Failed schemas ({len(failed)}): {failed}")
+    logger.info("=== Silver schema processing summary ===")
+    logger.info("Succeeded schemas (%d): %s", len(succeeded), succeeded)
+    logger.info("Failed schemas (%d): %s", len(failed), failed)
 
 
-with SparkSessionManager("airbnb") as spark:
-    storage = S3StorageHandler(spark)
+def main() -> None:
+    with SparkSessionManager("airbnb") as spark:
+        storage = S3StorageHandler(spark)
 
-    bronze_df = storage.read_files(f"s3a://{bronze_bucket}/listing_*.parquet")
-    listing_processor = ListingProcessor(bronze_df)
-    cleaned_df = listing_processor.process()
-    listing_processor.validate_cleaned_data()
+        bronze_df = storage.read_files(f"s3a://{BRONZE_BUCKET}/listing_*.parquet")
+        listing_processor = ListingProcessor(bronze_df)
+        cleaned_df = listing_processor.process()
+        listing_processor.validate_cleaned_data()
 
-    process_silver_tables(cleaned_df, SILVER_SCHEMAS, storage, silver_bucket)
+        process_silver_tables(cleaned_df, SILVER_SCHEMAS, storage, SILVER_BUCKET)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()

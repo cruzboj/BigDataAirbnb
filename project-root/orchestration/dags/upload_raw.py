@@ -1,6 +1,8 @@
-from airflow.decorators import dag, task
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
+
+from airflow.decorators import dag  # type: ignore[attr-defined]
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
 
 @dag(
     dag_id="upload_raw_dag",
@@ -8,16 +10,15 @@ from datetime import datetime
     schedule=None,
     catchup=False,
 )
-
 def upload_raw_dag():
-
-    upload_raw = SparkSubmitOperator(
-        task_id='upload_raw',
+    SparkSubmitOperator(
+        task_id="upload_raw",
         application="/opt/airflow/processing/tasks/upload_bronze.py",
         conn_id="my_spark_conn",
         packages="org.apache.hadoop:hadoop-aws:3.4.1,com.amazonaws:aws-java-sdk-bundle:1.12.367",
         env_vars={"PYTHONPATH": "/opt/airflow"},
-        verbose=True
+        verbose=True,
     )
+
 
 upload_raw_dag()

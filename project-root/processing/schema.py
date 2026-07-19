@@ -1,3 +1,4 @@
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
     from_json,
@@ -21,7 +22,7 @@ from pyspark.sql.types import (
 )
 
 
-def field(name, data_type, nullable=True):
+def field(name: str, data_type, nullable: bool = True) -> StructField:
     return StructField(name, data_type, nullable)
 
 
@@ -594,11 +595,11 @@ ALL_SCHEMAS.update(SILVER_SCHEMAS)
 ALL_SCHEMAS.update(GOLD_SCHEMAS)
 
 
-def get_schema(name):
+def get_schema(name: str) -> StructType:
     return ALL_SCHEMAS[name]
 
 
-def list_schemas():
+def list_schemas() -> tuple[str, ...]:
     return tuple(ALL_SCHEMAS.keys())
 
 
@@ -621,7 +622,7 @@ def format_schema(schema: StructType) -> StructType:
     )
 
 
-def parse_array_columns(df, target_schema: StructType):
+def parse_array_columns(df: DataFrame, target_schema: StructType) -> DataFrame:
     """
     Parse stringified list values (e.g. "['email','phone']") into arrays.
     """
