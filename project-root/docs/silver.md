@@ -107,21 +107,10 @@ erDiagram
         datetime start_date
         datetime end_date
         bool is_current
-        
-        datetime first_review
-        datetime last_review
-        int number_of_reviews
         int number_of_reviews_ltm
-        int number_of_reviews_l30d
-        int number_of_reviews_ly 
         float review_scores_rating
         float review_scores_accuracy
         float review_scores_cleanliness
-        float review_scores_checkin
-        float review_scores_communication
-        float review_scores_location
-        float review_scores_value
-        float reviews_per_month
 
         int reviewer_id 
         string reviewer_name    
