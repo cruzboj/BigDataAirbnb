@@ -64,3 +64,25 @@ class DataLoader:
             dataframes.append(enriched_df)
 
         return dataframes
+    
+    def load_delayed(self, target_schema: StructType, path: str | None = None
+        ) -> list[DataFrame]:
+        schema = format_schema(target_schema)
+
+        if not path:
+            raise ValueError("path cannot be empty")
+
+        df = (
+            self.spark.readStream.schema(schema)
+            .option("header", "true")
+            .option("multiLine", "true")
+            .option("quote", '"')
+            .option("escape", '"')
+            .csv(path)
+        )
+
+
+        dataframe = df.withColumn("ingestion_ts", current_timestamp())
+        dataframe = dataframe.withWatermark("last_updated", "48 hours")
+
+        return dataframe
