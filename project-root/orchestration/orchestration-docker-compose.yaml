@@ -7,8 +7,11 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow_password@postgres/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    PYTHONPATH: /opt/airflow
     # AIRFLOW_CONN_MY_SPARK_CONN: "spark://local"
     AIRFLOW_CONN_MY_SPARK_CONN: '{"conn_type": "spark", "host": "spark://spark-iceberg", "port": 7077}'
+    AIRFLOW_CONN_KAFKA_DEFAULT: '{"conn_type": "kafka", "extra": {"bootstrap.servers": "kafka:9092", "group.id": "airflow-kafka-sensor", "auto.offset.reset": "earliest"}}'
+    AIRFLOW_VAR_KAFKA_TOPIC: airbnb_reviews
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false" #auto unpause DAGs when they are created
   volumes:
     - ./dags:/opt/airflow/dags
@@ -59,6 +62,14 @@ services:
     <<: *airflow-common
     container_name: airflow_scheduler
     command: airflow scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow-triggerer:
+    <<: *airflow-common
+    container_name: airflow_triggerer
+    command: airflow triggerer
     depends_on:
       postgres:
         condition: service_healthy

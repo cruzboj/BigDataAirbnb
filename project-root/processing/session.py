@@ -4,6 +4,10 @@ from pyspark.sql import SparkSession
 
 from processing.const import MINIO_ACCESS_KEY, MINIO_ENDPOINT, MINIO_SECRET_KEY
 
+# Keep Hadoop AWS libs aligned with the Hadoop version bundled with Spark 3.5.x.
+HADOOP_AWS_PACKAGE = "org.apache.hadoop:hadoop-aws:3.3.4"
+AWS_SDK_BUNDLE_PACKAGE = "com.amazonaws:aws-java-sdk-bundle:1.12.367"
+
 
 class SparkSessionManager:
     """Context manager for creating and stopping a configured SparkSession."""
@@ -15,7 +19,10 @@ class SparkSessionManager:
     def __enter__(self) -> SparkSession:
         self.spark = (
             SparkSession.builder.appName(self.app_name)
-            .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.4.2")
+            .config(
+                "spark.jars.packages",
+                f"{HADOOP_AWS_PACKAGE},{AWS_SDK_BUNDLE_PACKAGE}",
+            )
             .config("spark.hadoop.fs.s3a.endpoint", MINIO_ENDPOINT)
             .config("spark.hadoop.fs.s3a.access.key", MINIO_ACCESS_KEY)
             .config("spark.hadoop.fs.s3a.secret.key", MINIO_SECRET_KEY)

@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 
-# TODO: move localhost defaults to container-aware defaults in production.
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:29092")
 SCHEMA_REGISTRY_URL = os.getenv("SCHEMA_REGISTRY_URL", "http://localhost:8082")
 TOPIC_NAME = "airbnb_reviews"

@@ -15,12 +15,10 @@ def create_bucket_dag():
         task_id="create_bucket",
         application="/opt/airflow/processing/tasks/create_bucket.py",
         conn_id="my_spark_conn",
-        packages="org.apache.hadoop:hadoop-aws:3.4.1,com.amazonaws:aws-java-sdk-bundle:1.12.367",
+        packages="org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.367",
         deploy_mode="client",
         env_vars={"PYTHONPATH": "/opt/airflow"},
-        conf={
-            "spark.executorEnv.PYTHONPATH": "/home/iceberg"
-        },
+        conf={"spark.executorEnv.PYTHONPATH": "/home/iceberg"},
         verbose=True,
     )
 

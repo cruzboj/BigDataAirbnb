@@ -16,6 +16,12 @@ from streaming.stream_type import ReviewType
 
 logger = logging.getLogger(__name__)
 
+AVRO_REVIEW_FIELDS = {
+    field["name"]
+    for field in json.loads(review_avro_schema).get("fields", [])
+    if isinstance(field, dict) and "name" in field
+}
+
 
 def delivery_report(err, msg) -> None:
     if err is not None:
@@ -72,6 +78,8 @@ class ReviewStreamReader:
 
     def stream_reviews(self) -> None:
         """Parse rows and produce records to Kafka with Avro serialization."""
+        produced_count = 0
+
         for row in self.read_rows():
             try:
                 review = ReviewType.from_row(row)
@@ -81,16 +89,37 @@ class ReviewStreamReader:
                 )
                 continue
 
+            payload = review.to_dict()
+            unknown_fields = set(payload.keys()) - AVRO_REVIEW_FIELDS
+            missing_fields = AVRO_REVIEW_FIELDS - set(payload.keys())
+
+            if unknown_fields or missing_fields:
+                logger.warning(
+                    "Skipping row id=%s due to schema mismatch. unknown=%s missing=%s",
+                    row.get("id"),
+                    sorted(unknown_fields),
+                    sorted(missing_fields),
+                )
+                continue
+
+            logger.info(
+                "Producing Kafka message #%d to topic '%s' payload=%s",
+                produced_count + 1,
+                TOPIC_NAME,
+                json.dumps(payload, ensure_ascii=False),
+            )
+
             self.producer.produce(
                 topic=TOPIC_NAME,
-                value=review.to_dict(),
+                value=payload,
                 on_delivery=delivery_report,
             )
             self.producer.poll(0)
+            produced_count += 1
             time.sleep(0.5)
 
         self.producer.flush()
-        logger.info("Streaming completed.")
+        logger.info("Streaming completed. Produced %d message(s).", produced_count)
 
 
 def main() -> None:

@@ -31,8 +31,14 @@ class S3StorageHandler:
             logger.exception("Error interacting with MinIO")
             raise
 
-    def bucket_upload(self, bucket: str, filename: str, dataframe: DataFrame) -> None:
-        dataframe.write.mode("overwrite").parquet(f"s3a://{bucket}/{filename}")
+    def bucket_upload(
+        self,
+        bucket: str,
+        filename: str,
+        dataframe: DataFrame,
+        mode: str = "overwrite",
+    ) -> None:
+        dataframe.write.mode(mode).parquet(f"s3a://{bucket}/{filename}")
 
     def read_files(self, file_path: str) -> DataFrame:
         return self.spark.read.parquet(file_path)

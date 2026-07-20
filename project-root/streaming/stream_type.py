@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -38,12 +39,12 @@ class ReviewType:
             date=row.get("date"),
             reviewer_id=_to_int(row.get("reviewer_id")),
             reviewer_name=row.get("reviewer_name"),
-            comments=row.get("comments"),
+            comments=row.get("comments") or row.get("comment"),
             language=row.get("language"),
             sentiment_score=_to_float(row.get("sentiment_score")),
             sentiment_label=_to_str_list(row.get("sentiment_label")),
-            likes_votes=_to_int(row.get("likes_votes")),
-            event_ingestion_time=row.get("event_ingestion_time"),
+            likes_votes=_to_int(row.get("likes_votes") or row.get("likes_count")),
+            event_ingestion_time=_to_iso_ts(row.get("event_ingestion_time")),
             raw_user_agent=row.get("raw_user_agent"),
             bot_suspicion_score=_to_float(row.get("bot_suspicion_score")),
             reviewer_hash_id=row.get("reviewer_hash_id"),
@@ -54,7 +55,8 @@ class ReviewType:
             session_id=row.get("session_id"),
             time_spent_on_review_ms=_to_int(row.get("time_spent_on_review_ms")),
             contains_media=_to_bool(row.get("contains_media")),
-            ingestion_ts=row.get("ingestion_ts") or datetime.now().isoformat(),
+            ingestion_ts=_to_iso_ts(row.get("ingestion_ts"))
+            or datetime.now(timezone.utc).isoformat(),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -72,6 +74,20 @@ def _to_float(value: Any) -> float | None:
 def _to_str_list(value: Any) -> list[str] | None:
     if value in (None, ""):
         return None
+
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+
+    if isinstance(value, str):
+        raw = value.strip()
+        if raw.startswith("[") and raw.endswith("]"):
+            try:
+                parsed = json.loads(raw.replace("'", '"'))
+                if isinstance(parsed, list):
+                    return [str(item).strip() for item in parsed if str(item).strip()]
+            except json.JSONDecodeError:
+                pass
+
     return [item.strip() for item in str(value).split(",") if item.strip()]
 
 
@@ -79,3 +95,20 @@ def _to_bool(value: Any) -> bool | None:
     if value in (None, ""):
         return None
     return str(value).strip().lower() in {"true", "1", "yes", "y"}
+
+
+def _to_iso_ts(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+
+    text = str(value).strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+
+    try:
+        dt = datetime.fromisoformat(text)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.isoformat()
+    except ValueError:
+        return str(value)
