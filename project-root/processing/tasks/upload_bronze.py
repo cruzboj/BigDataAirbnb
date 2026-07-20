@@ -16,7 +16,6 @@ def main() -> None:
         data_loader = DataLoader("airbnb", spark=spark)
 
         listing_batches = data_loader.load_batch(bronze_listing_schema, LISTINGS_PATH)
-        review_batches = data_loader.load_batch(bronze_reviews_schema, REVIEWS_PATH)
 
         storage = S3StorageHandler(spark)
 
@@ -24,15 +23,8 @@ def main() -> None:
             filename = extract_filename(batch)
             storage.bucket_upload(BRONZE_BUCKET, f"listing_{filename}.parquet", batch)
 
-        for batch in review_batches:
-            filename = extract_filename(batch)
-            storage.bucket_upload(BRONZE_BUCKET, f"review_{filename}.parquet", batch)
-
         listing_df = storage.read_files(f"s3a://{BRONZE_BUCKET}/listing_*.parquet")
         listing_df.show(1)
-
-        review_df = storage.read_files(f"s3a://{BRONZE_BUCKET}/review_*.parquet")
-        review_df.show(1)
 
         logger.info("Bronze upload task completed.")
 

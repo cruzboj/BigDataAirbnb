@@ -7,7 +7,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow_password@postgres/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-    AIRFLOW_CONN_MY_SPARK_CONN: "spark://local"
+    # AIRFLOW_CONN_MY_SPARK_CONN: "spark://local"
+    AIRFLOW_CONN_MY_SPARK_CONN: '{"conn_type": "spark", "host": "spark://spark-iceberg", "port": 7077}'
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false" #auto unpause DAGs when they are created
   volumes:
     - ./dags:/opt/airflow/dags

@@ -8,7 +8,7 @@ confluent-kafka
 fastavro
 httpx
 minio
-pyspark
+pyspark==3.5.5
 requests
 
 scikit-learn

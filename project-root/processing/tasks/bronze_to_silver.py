@@ -215,8 +215,6 @@ def main() -> None:
         listing_bronze_df = storage.read_files(
             f"s3a://{BRONZE_BUCKET}/listing_*.parquet"
         )
-        review_bronze_df = storage.read_files(f"s3a://{BRONZE_BUCKET}/review_*.parquet")
-
         listing_processor = ListingProcessor(listing_bronze_df)
         cleaned_listing_df = listing_processor.process()
         listing_processor.validate_cleaned_data()
@@ -224,16 +222,10 @@ def main() -> None:
         non_review_schemas = {
             name: schema for name, schema in SILVER_SCHEMAS.items() if name != "Review"
         }
+
         process_silver_tables(
             cleaned_listing_df,
             non_review_schemas,
-            storage,
-            SILVER_BUCKET,
-        )
-
-        process_review_table(
-            cleaned_listing_df,
-            review_bronze_df,
             storage,
             SILVER_BUCKET,
         )
