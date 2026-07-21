@@ -64,9 +64,10 @@ class DataLoader:
             dataframes.append(enriched_df)
 
         return dataframes
-    
-    def load_delayed(self, target_schema: StructType, path: str | None = None
-        ) -> list[DataFrame]:
+
+    def load_delayed(
+        self, target_schema: StructType, path: str | None = None
+    ) -> DataFrame:
         schema = format_schema(target_schema)
 
         if not path:
@@ -80,7 +81,6 @@ class DataLoader:
             .option("escape", '"')
             .csv(path)
         )
-
 
         dataframe = df.withColumn("ingestion_ts", current_timestamp())
         dataframe = dataframe.withWatermark("last_updated", "48 hours")
