@@ -13,3 +13,4 @@ LISTINGS_PATH = [
     str(DATA_DIR / "listings_copenhagen_denmark.csv.gz"),
     str(DATA_DIR / "listings_chicago_usa.csv.gz"),
 ]
+LATE_ARRIVAL_PATH = "/opt/airflow/data/late-arrival/"
