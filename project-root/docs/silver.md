@@ -101,24 +101,21 @@ erDiagram
     }
 
     Review{
-        int id PK "(FK listing_id from hostDetails)"
-        
-        datetime date   
+        long id PK "review_id"
+        long listing_id FK "listing.id"
+
+        datetime date
         datetime start_date
         datetime end_date
         bool is_current
-        int number_of_reviews_ltm
-        float review_scores_rating
-        float review_scores_accuracy
-        float review_scores_cleanliness
 
-        int reviewer_id 
-        string reviewer_name    
+        long reviewer_id
+        string reviewer_name
         string comment
         string language
         float sentiment_score
         list sentiment_label "[positive,negative,neutral]"
-        int likes_count 
+        int likes_count
 
         datetime ingestion_ts
     }

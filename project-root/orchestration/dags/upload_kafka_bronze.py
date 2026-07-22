@@ -8,7 +8,10 @@ from typing import Any
 
 from airflow.decorators import dag, task  # type: ignore[attr-defined]
 from airflow.models import Variable
-from airflow.operators.python import get_current_context
+from airflow.operators.python import get_current_context  # type: ignore[attr-defined]
+from airflow.operators.trigger_dagrun import (  # type: ignore[attr-defined]
+    TriggerDagRunOperator,
+)
 from pyspark.sql import functions as F
 
 from processing.const import BRONZE_BUCKET
@@ -248,7 +251,16 @@ def upload_kafka_to_bronze() -> None:
         )
         return output_path
 
-    upload_message_to_bronze()
+    bronze_path = upload_message_to_bronze()
+
+    trigger_kafka_reviews_cleaning = TriggerDagRunOperator(
+        task_id="trigger_clean_kafka_reviews_to_silver",
+        trigger_dag_id="clean_reviews",
+        wait_for_completion=True,
+        poke_interval=5,
+    )
+
+    bronze_path >> trigger_kafka_reviews_cleaning
 
 
 upload_kafka_to_bronze()

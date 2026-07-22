@@ -135,7 +135,10 @@ def process_review_table(
         review_input_count = review_df.count()
         logger.info("Review bronze row count: %d", review_input_count)
 
-        review_scd_window = Window.partitionBy("id").orderBy(col("date").asc())
+        review_scd_window = Window.partitionBy("reviewer_id").orderBy(
+            col("date").asc(),
+            col("id").asc(),
+        )
 
         review_scd_df = (
             review_df.withColumn("start_date", col("date"))
@@ -146,26 +149,7 @@ def process_review_table(
             "Applied SCD Type 2 columns for Review (start_date, end_date, is_current)"
         )
 
-        listing_review_fields = [
-            "review_scores_rating",
-            "review_scores_accuracy",
-            "review_scores_cleanliness",
-            "number_of_reviews_ltm",
-        ]
-        listing_lookup_df = listing_df.select(
-            col("id").alias("listing_id"),
-            *[col(field_name) for field_name in listing_review_fields],
-        ).dropDuplicates(["listing_id"])
-        logger.info(
-            "Joining review bronze with listing fields needed by gold model: %s",
-            listing_review_fields,
-        )
-        review_scd_df = review_scd_df.join(
-            listing_lookup_df, on="listing_id", how="left"
-        )
-
         review_column_mapping = {
-            "id": "listing_id",
             "comment": "comments",
             "likes_count": "likes_votes",
         }
@@ -194,9 +178,7 @@ def process_review_table(
             storage_handler,
             silver_bucket,
             column_mapping=review_column_mapping,
-            natural_keys_override={
-                "Review": ["id", "reviewer_id", "start_date", "comment"]
-            },
+            natural_keys_override={"Review": ["id"]},
         )
         logger.info(
             "Finished Review silver table processing for bucket %s", silver_bucket

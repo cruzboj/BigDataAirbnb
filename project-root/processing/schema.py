@@ -279,14 +279,11 @@ silver_location_schema = StructType(
 silver_review_schema = StructType(
     [
         field("id", LongType()),
+        field("listing_id", LongType()),
         field("date", TimestampType()),
         field("start_date", TimestampType()),
         field("end_date", TimestampType()),
         field("is_current", BooleanType()),
-        field("number_of_reviews_ltm", IntegerType()),
-        field("review_scores_rating", FloatType()),
-        field("review_scores_accuracy", FloatType()),
-        field("review_scores_cleanliness", FloatType()),
         field("reviewer_id", LongType()),
         field("reviewer_name", StringType()),
         field("comment", StringType()),
