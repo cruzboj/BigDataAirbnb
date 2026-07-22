@@ -312,10 +312,6 @@ silver_provider_details_schema = StructType(
     [
         field("id", IntegerType()),
         field("name", StringType()),
-        field("desc", StringType()),
-        field("price_per_ad", IntegerType()),
-        field("n_listings", IntegerType()),
-        field("last_updated", TimestampType()),
         field("ingestion_ts", TimestampType()),
     ]
 )

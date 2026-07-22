@@ -96,7 +96,6 @@ erDiagram
       datetime end_date
       bool is_current
       string name
-      string desc
 
       datetime ingestion_ts
     }

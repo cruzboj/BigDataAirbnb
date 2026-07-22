@@ -135,10 +135,6 @@ erDiagram
         int id PK
         
         string name
-        string desc
-        int price_per_ad
-        int n_listings
-        datetime last_updated
 
         datetime ingestion_ts
     }
