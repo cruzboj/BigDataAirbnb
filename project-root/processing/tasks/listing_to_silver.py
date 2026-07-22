@@ -2,7 +2,7 @@ import logging
 from collections.abc import Mapping
 
 from pyspark.sql import DataFrame, Window
-from pyspark.sql.functions import col, lead, lit
+from pyspark.sql.functions import coalesce, col, lead, lit, lower, trim, when
 from pyspark.sql.types import StructType
 
 from processing.cleanup.listing import ListingProcessor
@@ -11,7 +11,7 @@ from processing.schema import SILVER_SCHEMAS, silver_review_schema
 from processing.session import SparkSessionManager
 from processing.storage.s3 import S3StorageHandler
 
-logger = logging.getLogger("airbnb.processing.tasks.bronze_to_silver")
+logger = logging.getLogger("airbnb.processing.tasks.listing_to_silver")
 
 
 def process_silver_tables(
@@ -77,6 +77,45 @@ def process_silver_tables(
                 )
 
             silver_df = bronze_df.select(*cast_exprs)
+
+            if table_name in {
+                "HostDetails",
+                "HostMetrics",
+                "RentDetails",
+                "RentMetrics",
+                "Location",
+                "Metadata",
+            }:
+                silver_df = silver_df.filter(col("id").isNotNull())
+
+            if table_name == "HostMetrics":
+                silver_df = silver_df.withColumn(
+                    "host_response_time",
+                    when(
+                        col("host_response_time").isNull()
+                        | (trim(col("host_response_time")) == "")
+                        | lower(trim(col("host_response_time"))).isin(
+                            "n/a", "na", "null", "none"
+                        ),
+                        lit("unknown"),
+                    ).otherwise(trim(col("host_response_time"))),
+                )
+
+            if table_name == "RentMetrics":
+                silver_df = (
+                    silver_df.withColumn(
+                        "price_per_night",
+                        coalesce(col("price_per_night"), lit(0.0)),
+                    )
+                    .withColumn(
+                        "estimated_revenue_l365d",
+                        coalesce(col("estimated_revenue_l365d"), lit(0)),
+                    )
+                    .withColumn(
+                        "estimated_occupancy_l365d",
+                        coalesce(col("estimated_occupancy_l365d"), lit(0)),
+                    )
+                )
 
             if table_name in natural_keys:
                 silver_df = silver_df.dropDuplicates(natural_keys[table_name])

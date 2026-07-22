@@ -18,6 +18,7 @@ SPARK_S3_PACKAGES = os.getenv(
 SPARK_MAVEN_REPOSITORIES = os.getenv(
     "SPARK_MAVEN_REPOSITORIES", "https://repo.maven.apache.org/maven2"
 )
+SPARK_CORES_MAX = os.getenv("SPARK_CORES_MAX", "4")
 
 # Backward-compatible aliases
 bronze_bucket = BRONZE_BUCKET

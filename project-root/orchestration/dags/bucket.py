@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from airflow.decorators import dag  # type: ignore[attr-defined]
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
-from config.const import SPARK_MAVEN_REPOSITORIES, SPARK_S3_PACKAGES
+from config.const import SPARK_CORES_MAX, SPARK_MAVEN_REPOSITORIES, SPARK_S3_PACKAGES
 
 
 @dag(
@@ -21,7 +21,10 @@ def create_bucket_dag():
         repositories=SPARK_MAVEN_REPOSITORIES,
         deploy_mode="client",
         env_vars={"PYTHONPATH": "/opt/airflow"},
-        conf={"spark.executorEnv.PYTHONPATH": "/home/iceberg"},
+        conf={
+            "spark.executorEnv.PYTHONPATH": "/home/iceberg",
+            "spark.cores.max": SPARK_CORES_MAX,
+        },
         verbose=True,
         retries=3,
         retry_delay=timedelta(minutes=1),

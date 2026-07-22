@@ -1,7 +1,10 @@
+# pyright: reportMissingImports=false
 from datetime import datetime
 
-from airflow.decorators import dag
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.decorators import dag  # type: ignore[attr-defined]
+from airflow.operators.trigger_dagrun import (  # type: ignore[import-not-found]
+    TriggerDagRunOperator,
+)
 
 
 @dag(
@@ -30,13 +33,19 @@ def spark_dag():
         wait_for_completion=True,
     )
 
+    trigger_silver_to_gold = TriggerDagRunOperator(
+        task_id="trigger_silver_to_gold",
+        trigger_dag_id="silver_to_gold_dag",
+        wait_for_completion=True,
+    )
+
     trigger_late_upload = TriggerDagRunOperator(
         task_id="trigger_late_upload",
         trigger_dag_id="late_arrival_upload",
         wait_for_completion=True,
     )
 
-    trigger_bucket >> trigger_upload >> trigger_clean
+    trigger_bucket >> trigger_upload >> trigger_clean >> trigger_silver_to_gold
     trigger_bucket >> trigger_late_upload
 
 

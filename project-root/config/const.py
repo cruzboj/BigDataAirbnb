@@ -23,6 +23,7 @@ SPARK_S3_PACKAGES = os.getenv(
 SPARK_MAVEN_REPOSITORIES = os.getenv(
     "SPARK_MAVEN_REPOSITORIES", "https://repo.maven.apache.org/maven2"
 )
+SPARK_CORES_MAX = os.getenv("SPARK_CORES_MAX", "4")
 
 # Bronze (streamed Kafka reviews) input path and silver output key for cleaning task
 STREAMING_DATA_PATH = os.getenv(

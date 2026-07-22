@@ -6,6 +6,7 @@ from processing.const import (
     MINIO_ACCESS_KEY,
     MINIO_ENDPOINT,
     MINIO_SECRET_KEY,
+    SPARK_CORES_MAX,
     SPARK_MAVEN_REPOSITORIES,
     SPARK_S3_PACKAGES,
 )
@@ -37,6 +38,7 @@ class SparkSessionManager:
             )
             .config("spark.sql.adaptive.enabled", "true")
             .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+            .config("spark.cores.max", SPARK_CORES_MAX)
             .getOrCreate()
         )
         return self.spark

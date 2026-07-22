@@ -66,6 +66,7 @@ class ListingProcessor:
             ._normalize_rates()
             ._normalize_booleans()
             ._normalize_timestamps()
+            ._apply_default_values()
             ._apply_sanity_checks()
             .df
         )
@@ -146,12 +147,30 @@ class ListingProcessor:
         return self
 
     def _normalize_rates(self) -> "ListingProcessor":
-        self.df = self.df.withColumn(
-            "host_response_rate",
-            self._safe_to_double("host_response_rate", remove_pattern="%", default=0.0),
-        ).withColumn(
-            "host_acceptance_rate",
-            self._safe_to_int("host_acceptance_rate", remove_pattern="%", default=0),
+        self.df = (
+            self.df.withColumn(
+                "host_response_rate",
+                self._safe_to_double(
+                    "host_response_rate", remove_pattern="%", default=0.0
+                ),
+            )
+            .withColumn(
+                "host_acceptance_rate",
+                self._safe_to_int(
+                    "host_acceptance_rate", remove_pattern="%", default=0
+                ),
+            )
+            .withColumn(
+                "host_response_time",
+                when(
+                    col("host_response_time").isNull()
+                    | (trim(col("host_response_time")) == "")
+                    | lower(trim(col("host_response_time"))).isin(
+                        "n/a", "na", "null", "none"
+                    ),
+                    lit("unknown"),
+                ).otherwise(trim(col("host_response_time"))),
+            )
         )
         return self
 
@@ -163,6 +182,39 @@ class ListingProcessor:
     def _normalize_timestamps(self) -> "ListingProcessor":
         for column_name in self.TIMESTAMP_COLUMNS:
             self.df = self.df.withColumn(column_name, to_timestamp(col(column_name)))
+        return self
+
+    def _apply_default_values(self) -> "ListingProcessor":
+        self.df = (
+            self.df.withColumn("price", coalesce(col("price"), lit(0.0)))
+            .withColumn(
+                "estimated_revenue_l365d",
+                coalesce(col("estimated_revenue_l365d"), lit(0)),
+            )
+            .withColumn(
+                "estimated_occupancy_l365d",
+                coalesce(col("estimated_occupancy_l365d"), lit(0)),
+            )
+            .withColumn("availability_30", coalesce(col("availability_30"), lit(0)))
+            .withColumn("availability_60", coalesce(col("availability_60"), lit(0)))
+            .withColumn("availability_90", coalesce(col("availability_90"), lit(0)))
+            .withColumn("availability_365", coalesce(col("availability_365"), lit(0)))
+            .withColumn("availability_eoy", coalesce(col("availability_eoy"), lit(0)))
+            .withColumn(
+                "number_of_reviews_ltm", coalesce(col("number_of_reviews_ltm"), lit(0))
+            )
+            .withColumn(
+                "number_of_reviews_l30d",
+                coalesce(col("number_of_reviews_l30d"), lit(0)),
+            )
+            .withColumn(
+                "number_of_reviews_ly", coalesce(col("number_of_reviews_ly"), lit(0))
+            )
+            .withColumn(
+                "host_total_listings_count",
+                coalesce(col("host_total_listings_count"), lit(0)),
+            )
+        )
         return self
 
     def _apply_sanity_checks(self) -> "ListingProcessor":

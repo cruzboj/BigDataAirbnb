@@ -15,12 +15,6 @@ from processing.storage.s3 import S3StorageHandler
 logger = logging.getLogger("airbnb.processing.tasks.late_arrival_to_silver")
 
 
-def _trim_and_null_if_blank(column: str) -> F.Column:
-    return F.when(F.trim(F.col(column)) == "", F.lit(None)).otherwise(
-        F.trim(F.col(column))
-    )
-
-
 def _cast_to_schema(df: DataFrame, schema: StructType) -> DataFrame:
     cast_exprs = []
     for field in schema:
@@ -34,7 +28,13 @@ def _clean_adsprovider_bronze(bronze_df: DataFrame) -> DataFrame:
     cleaned = (
         bronze_df.filter(F.col("id").isNotNull())
         .withColumn("id", F.col("id"))
-        .withColumn("name", _trim_and_null_if_blank("name"))
+        .withColumn(
+            "name",
+            F.when(
+                F.col("name").isNull() | (F.trim(F.col("name")) == ""),
+                F.lit(""),
+            ).otherwise(F.trim(F.col("name"))),
+        )
         .withColumn(
             "avg_conversion_rate", F.coalesce(F.col("avg_conversion_rate"), F.lit(0.0))
         )
@@ -49,7 +49,14 @@ def _clean_adsprovider_bronze(bronze_df: DataFrame) -> DataFrame:
             "return_on_investment",
             F.coalesce(F.col("return_on_investment"), F.lit(0.0)),
         )
-        .withColumn("region_coverage", _trim_and_null_if_blank("region_coverage"))
+        .withColumn(
+            "region_coverage",
+            F.when(
+                F.col("region_coverage").isNull()
+                | (F.trim(F.col("region_coverage")) == ""),
+                F.lit("unkown"),
+            ).otherwise(F.trim(F.col("region_coverage"))),
+        )
         .withColumn("churn_rate", F.col("churn_rate_provider"))
         .withColumn("avg_cpc", F.coalesce(F.col("avg_cpc"), F.lit(0.0)))
         .withColumn("avg_cpm", F.coalesce(F.col("avg_cpm"), F.lit(0.0)))
@@ -58,7 +65,12 @@ def _clean_adsprovider_bronze(bronze_df: DataFrame) -> DataFrame:
             F.coalesce(F.col("concurrent_campaigns_count"), F.lit(0)),
         )
         .withColumn(
-            "data_compliance_level", _trim_and_null_if_blank("data_compliance_level")
+            "data_compliance_level",
+            F.when(
+                F.col("data_compliance_level").isNull()
+                | (F.trim(F.col("data_compliance_level")) == ""),
+                F.lit("unkown"),
+            ).otherwise(F.trim(F.col("data_compliance_level"))),
         )
         .withColumn(
             "partition_date",

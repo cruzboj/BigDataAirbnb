@@ -7,15 +7,15 @@ from config.const import SPARK_CORES_MAX, SPARK_MAVEN_REPOSITORIES, SPARK_S3_PAC
 
 
 @dag(
-    dag_id="clean_reviews",
+    dag_id="silver_to_gold_dag",
     start_date=datetime(2026, 1, 1),
-    schedule=None,
+    schedule="@hourly",
     catchup=False,
 )
-def clean_kafka_reviews_to_silver_dag():
+def silver_to_gold_dag():
     SparkSubmitOperator(
-        task_id="clean_kafka_reviews_to_silver",
-        application="/opt/airflow/processing/tasks/reviews_to_silver.py",
+        task_id="silver_to_gold",
+        application="/opt/airflow/processing/tasks/silver_to_gold.py",
         conn_id="my_spark_conn",
         packages=SPARK_S3_PACKAGES,
         repositories=SPARK_MAVEN_REPOSITORIES,
@@ -31,4 +31,4 @@ def clean_kafka_reviews_to_silver_dag():
     )
 
 
-clean_kafka_reviews_to_silver_dag()
+silver_to_gold_dag()
