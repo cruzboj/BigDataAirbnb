@@ -686,14 +686,14 @@ Handles reviews data, focusing on filling missing values to ensure continuous se
 | Column | Default Value / Action if Missing or Null |
 | :--- | :--- |
 | `reviewer_id` | **Drop row** (Remove completely) |
-| `date` | Fallback to `event_ingestion_time` ➔ If still Null, fallback to `ts` |
+| `date` | Fallback to `event_ingestion_time` ➔ If still Null, fallback to `current_timestamp` |
 | `listing_id` | `-1` |
 | `sentiment_label` | `"positive"` |
-| `sentiment_score` | `1` |
+| `sentiment_score` | `0` (for Null/NaN) |
 | `reviewer_name` | `""` (Empty string) |
 | `language` | `"unknown"` |
-| `like_count` | `0` |
-| `ingestion_ts` | Cast to `datetime` |
+| `likes_count` | `0` |
+| `ingestion_ts` | Set to current timestamp |
 
 ---
 
@@ -703,7 +703,7 @@ Handles delayed Ad performance data, zeroing out metrics when campaign data is m
 | Column | Default Value / Action if Missing or Null |
 | :--- | :--- |
 | `id` | **Drop row** (Remove completely) |
-| `name` | `""` (Empty string) |
+| `name` | `""` (Empty string; also for token values like `null`/`nan`) |
 | `avg_conversion_rate` | `0` |
 | `post_amount` | `0` |
 | `total_impressions` | `0` |
@@ -713,11 +713,10 @@ Handles delayed Ad performance data, zeroing out metrics when campaign data is m
 | `avg_cpc` | `0` |
 | `avg_cpm` | `0` |
 | `campaigns_count` | `0` |
-| `region_coverage` | `"unknown"` |
-| `data_compliance_level`| `"unknown"` |
-| `churn_rate` | **TBD** (Needs business definition/clarification) |
-| `partition_date` | Fallback to `last_update` ➔ If still Null, fallback to `current_ts` |
-| `ingestion_ts` | Set to current time |
+| `region_coverage` | `"unkown"` |
+| `data_compliance_level`| `"unkown"` |
+| `partition_date` | Fallback to `last_updated` ➔ If still Null, fallback to `current_timestamp` |
+| `ingestion_ts` | Set to current timestamp |
 
 ---
 
@@ -754,3 +753,18 @@ Handles property listings, including column renaming, missing value fallbacks, a
 ### C. SCD Type 2 Logic Preparation
 *   **`start_date`:** Add this column using `date` as the default value.
 *   **`end_date`:** Add this column, retrieving the value from the `start_date` of the *next* row (Lead function).
+
+---
+
+## 4. Pipeline: `silver_to_gold`
+Business-layer quality rules applied while generating Gold tables.
+
+| Gold Table / Column | Default Value / Action |
+| :--- | :--- |
+| `dimProvider.provider_key` | **Drop row** when `provider_key` is Null |
+| `AggNeighbourhoodInvest.neighbourhood_needed_boost` | Derived from `avg_revenue_l365d`: `> 20000` ➔ `["low"]`, else `["high"]` |
+| `AggAds.provider_name` | Uses already-cleaned `providerDetails.name` from Silver (no extra fallback in Gold) |
+| `dimHost.end_date`, `dimProperty.end_date`, `dimProvider.end_date` | Null is expected for current SCD rows |
+| `factReview` review score columns | Removed from Gold schema/output (`review_scores_rating`, `review_scores_accuracy`, `review_scores_cleanliness`) |
+| `AggNeighborhoodPerformance.avg_review_score` | Removed from Gold schema/output |
+| `AggNeighbourhoodInvest.avg_review_score` | Removed from Gold schema/output |
