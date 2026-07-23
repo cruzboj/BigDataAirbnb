@@ -152,7 +152,7 @@ After completing all the prerequisites and installation steps, you can start the
 The following command will build (if needed) and start all required services, including Kafka, Spark, Airflow, MinIO, Iceberg, and the supporting infrastructure.
 
 ```sh
-docker compose up -d
+docker compose up --build -d
 ```
 airflow - may take some time to get up youll need to wait about 5min or so...
 
@@ -178,6 +178,22 @@ uv run -m streaming.stream_reviews_airflow_producer
 
 The producer continuously generates review events and publishes them to Kafka. These events are then consumed by the Spark Streaming application, processed through the Bronze, Silver, and Gold layers, and orchestrated by Airflow.
 
-### Dashboard
+### MINIO UI
+
+    http://localhost:9001/browser/
+
+### Airflow UI
+
+    http://localhost:8081/home
+
+### Kafka UI
+    
+    http://localhost:9260/ui/clusters/local-cluster/all-topics
+
+### Spark UI
+
+    http://localhost:8080/
+    
+### Dashboard service
 The dashboard is available at `http://localhost:8000`.
 Once the data is in the Gold layer, the data will be displayed in the dashboard.
