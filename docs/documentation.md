@@ -38,6 +38,8 @@ our project convey business problem:
 1. Business Question: What cities are best invest promoting in?
 2. Business Question: Which promotion strategy is the best?
 
+
+
 <!-- ARCHITECTURE DIAGRAMS -->
 ## Architecture diagrams
 The pipeline supports both batch and streaming data ingestion.

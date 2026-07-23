@@ -76,6 +76,8 @@ our project working with .gz format but can also work with csv
 
 * listing csv | csv.gz must contain name formating listing_<city_name>_<country_name>.csv.gz
 * review csv | csv.gz must contain name formating reviews_<city_name>_<country_name>.csv.gz
+* Download the dataset files from: https://drive.google.com/drive/folders/1NOfar3JBi0AVVGaG-g_aiktpoqMtkyLU?usp=sharing
+* Place all downloaded files in `BigDataAirbnb/data/raw`
 
 <!-- INSTALLATION -->
 ## installation
@@ -175,3 +177,7 @@ uv run -m streaming.stream_reviews_airflow_producer
 ```
 
 The producer continuously generates review events and publishes them to Kafka. These events are then consumed by the Spark Streaming application, processed through the Bronze, Silver, and Gold layers, and orchestrated by Airflow.
+
+### Dashboard
+The dashboard is available at `http://localhost:8000`.
+Once the data is in the Gold layer, the data will be displayed in the dashboard.
