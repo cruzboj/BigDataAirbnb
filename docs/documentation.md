@@ -345,6 +345,7 @@ erDiagram
         int calculated_host_listings_count_entire_homes
         int calculated_host_listings_count_private_rooms
         int calculated_host_listings_count_shared_rooms
+        int number_of_reviews_ltm
         
         datetime ingestion_ts
     }
@@ -529,9 +530,6 @@ erDiagram
       string language
       int like_count 
       float sentiment_score
-      float review_scores_rating
-      float review_scores_accuracy
-      float review_scores_cleanliness
       int number_of_reviews_ltm
 
       datetime ingestion_ts
@@ -580,7 +578,6 @@ erDiagram
         list neighbourhood_needed_boost
         float avg_order_price
         float avg_revenue_l365d
-        float avg_review_score
         float median_availability
         float avg_response_rate
 
@@ -611,7 +608,6 @@ erDiagram
         float avg_price_per_night "AVG(fact_airbnb.price)"
         float avg_annual_revenue "AVG(factListing.estimated_revenue_l365d)"
         float avg_occupancy_rate "AVG(factListing.estimated_occupancy_l365d)"
-        float avg_review_score "AVG(factReview.review_scores_rating)"
         int total_reviews_ltm "SUM(factReview.number_of_reviews_ltm) - indicates current hype"
 
         datetime ingestion_ts
@@ -647,7 +643,6 @@ erDiagram
         int availability_30 "From factListing"
         float host_acceptance_rate "From factListing"
         string response_time_category "From dimHost"
-        float avg_review_scores_rating "Aggregated from AggNeighborhoodPerformance"
         
         %% Target Variable / Label (Y)
         bool is_premium_target "Label: 1 if price > 80th percentile of location, else 0"
@@ -742,10 +737,19 @@ Handles property listings, including column renaming, missing value fallbacks, a
 | Column | Default Value / Action if Missing or Null |
 | :--- | :--- |
 | `id` (Before rename) | **Drop row** (Remove completely if None/Null) |
+| `host_name` | `""` (Empty string, including token values like `nan`/`null`) |
 | `host_response_time` | `"unknown"` |
-| `RentMetrics` | Fallback to `price_per_night` ➔ If still Null, fallback to `0` |
+| `room_type` | `"unkown"` |
+| `property_type` | `"unkown"` |
+| `neighbourhood` | `"unkown"` |
+| `host_neighbourhood` | `"unkown"` |
+| `price_per_night` | `0` |
 | `estimated_revenue_l365d`| `0` |
 | `estimated_occupancy_l365d`| `0` |
+| `number_of_reviews_ltm` | `0` |
+| `bedrooms` | `0` |
+| `beds` | `0` |
+| `amenities` | `[]` |
 
 ### C. SCD Type 2 Logic Preparation
 *   **`start_date`:** Add this column using `date` as the default value.

@@ -31,7 +31,11 @@ def _clean_adsprovider_bronze(bronze_df: DataFrame) -> DataFrame:
         .withColumn(
             "name",
             F.when(
-                F.col("name").isNull() | (F.trim(F.col("name")) == ""),
+                F.col("name").isNull()
+                | (F.trim(F.col("name")) == "")
+                | F.lower(F.trim(F.col("name"))).isin(
+                    "n/a", "na", "null", "none", "nan"
+                ),
                 F.lit(""),
             ).otherwise(F.trim(F.col("name"))),
         )

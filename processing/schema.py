@@ -252,6 +252,7 @@ silver_rent_metrics_schema = StructType(
         field("calculated_host_listings_count_entire_homes", IntegerType()),
         field("calculated_host_listings_count_private_rooms", IntegerType()),
         field("calculated_host_listings_count_shared_rooms", IntegerType()),
+        field("number_of_reviews_ltm", IntegerType()),
         field("ingestion_ts", TimestampType()),
     ]
 )
@@ -410,9 +411,6 @@ gold_fact_review_schema = StructType(
         field("language", StringType()),
         field("like_count", IntegerType()),
         field("sentiment_score", FloatType()),
-        field("review_scores_rating", FloatType()),
-        field("review_scores_accuracy", FloatType()),
-        field("review_scores_cleanliness", FloatType()),
         field("number_of_reviews_ltm", IntegerType()),
         field("ingestion_ts", TimestampType()),
     ]
@@ -426,7 +424,6 @@ gold_dim_provider_schema = StructType(
         field("end_date", TimestampType()),
         field("is_current", BooleanType()),
         field("name", StringType()),
-        field("desc", StringType()),
         field("ingestion_ts", TimestampType()),
     ]
 )
@@ -464,7 +461,6 @@ gold_agg_neighbourhood_invest_schema = StructType(
         field("neighbourhood_needed_boost", STRING_ARRAY),
         field("avg_order_price", FloatType()),
         field("avg_revenue_l365d", FloatType()),
-        field("avg_review_score", FloatType()),
         field("median_availability", FloatType()),
         field("avg_response_rate", FloatType()),
         field("ingestion_ts", DateType()),
@@ -496,7 +492,6 @@ gold_agg_neighborhood_performance_schema = StructType(
         field("avg_price_per_night", FloatType()),
         field("avg_annual_revenue", FloatType()),
         field("avg_occupancy_rate", FloatType()),
-        field("avg_review_score", FloatType()),
         field("total_reviews_ltm", IntegerType()),
         field("ingestion_ts", TimestampType()),
     ]
@@ -529,7 +524,6 @@ gold_ml_feature_premium_pricing_schema = StructType(
         field("availability_30", IntegerType()),
         field("host_acceptance_rate", FloatType()),
         field("response_time_category", StringType()),
-        field("avg_review_scores_rating", FloatType()),
         field("is_premium_target", BooleanType()),
         field("ingestion_ts", TimestampType()),
     ]

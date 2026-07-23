@@ -233,9 +233,6 @@ def build_gold_listing_review(storage: S3StorageHandler) -> None:
         .withColumn("property_key", F.col("listing_id"))
         .withColumn("location_key", F.col("listing_id"))
         .withColumn("host_key", F.col("listing_id"))
-        .withColumn("review_scores_rating", F.lit(None).cast("float"))
-        .withColumn("review_scores_accuracy", F.lit(None).cast("float"))
-        .withColumn("review_scores_cleanliness", F.lit(None).cast("float"))
         .withColumn(
             "ingestion_ts",
             F.coalesce(F.col("review_ingestion_ts"), F.current_timestamp()),
@@ -262,7 +259,6 @@ def build_gold_listing_review(storage: S3StorageHandler) -> None:
             F.avg("price_per_night").alias("avg_price_per_night"),
             F.avg("estimated_revenue_l365d").alias("avg_annual_revenue"),
             F.avg("estimated_occupancy_l365d").alias("avg_occupancy_rate"),
-            F.avg("avg_sentiment_score").alias("avg_review_score"),
             F.sum(F.coalesce(F.col("number_of_reviews_ltm"), F.lit(0))).alias(
                 "total_reviews_ltm"
             ),
@@ -304,7 +300,6 @@ def build_gold_listing_review(storage: S3StorageHandler) -> None:
             .alias("neighbourhood_highest_reviews"),
             F.avg("price_per_night").alias("avg_order_price"),
             F.avg("estimated_revenue_l365d").alias("avg_revenue_l365d"),
-            F.avg("avg_sentiment_score").alias("avg_review_score"),
             F.expr("percentile_approx(availability_365, 0.5)")
             .cast("float")
             .alias("median_availability"),
@@ -314,12 +309,8 @@ def build_gold_listing_review(storage: S3StorageHandler) -> None:
             "neighbourhood_needed_boost",
             F.array(
                 F.when(
-                    F.col("avg_review_score").isNull(),
-                    F.lit("mid"),
-                )
-                .when(F.col("avg_review_score") < F.lit(0.33), F.lit("high"))
-                .when(F.col("avg_review_score") < F.lit(0.66), F.lit("mid"))
-                .otherwise(F.lit("low"))
+                    F.col("avg_revenue_l365d") > F.lit(20000), F.lit("low")
+                ).otherwise(F.lit("high"))
             ),
         )
         .withColumn("ingestion_ts", F.current_date())
@@ -383,10 +374,10 @@ def build_gold_listing_review(storage: S3StorageHandler) -> None:
 
         dim_provider_raw = (
             provider_details_base.withColumn("provider_key", F.col("provider_id"))
+            .filter(F.col("provider_key").isNotNull())
             .withColumn("start_date", F.current_timestamp())
             .withColumn("end_date", F.lit(None).cast("timestamp"))
             .withColumn("is_current", F.lit(True))
-            .withColumn("desc", F.lit(None).cast("string"))
             .withColumn(
                 "ingestion_ts",
                 F.coalesce(

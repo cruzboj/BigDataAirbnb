@@ -23,7 +23,10 @@ def _clean_sentiment_label() -> F.Column:
 
 
 def _clean_sentiment_score() -> F.Column:
-    return F.coalesce(F.col("sentiment_score").cast("float"), F.lit(1.0))
+    score = F.col("sentiment_score").cast("double")
+    return F.when(score.isNull() | F.isnan(score), F.lit(1.0)).otherwise(
+        score.cast("float")
+    )
 
 
 def _clean_reviews_df(bronze_reviews_df):

@@ -33,7 +33,7 @@ def process_silver_tables(
         merged_column_mapping.update(column_mapping)
 
     natural_keys = {
-        "HostDetails": ["host_id"],
+        "HostDetails": ["id"],
         "HostMetrics": ["id"],
         "RentDetails": ["id"],
         "RentMetrics": ["id"],
@@ -88,6 +88,43 @@ def process_silver_tables(
             }:
                 silver_df = silver_df.filter(col("id").isNotNull())
 
+            if table_name == "HostDetails":
+                silver_df = (
+                    silver_df.withColumn(
+                        "host_name",
+                        when(
+                            col("host_name").isNull()
+                            | (trim(col("host_name")) == "")
+                            | lower(trim(col("host_name"))).isin(
+                                "n/a", "na", "null", "none", "nan"
+                            ),
+                            lit(""),
+                        ).otherwise(trim(col("host_name"))),
+                    )
+                    .withColumn(
+                        "room_type",
+                        when(
+                            col("room_type").isNull()
+                            | (trim(col("room_type")) == "")
+                            | lower(trim(col("room_type"))).isin(
+                                "n/a", "na", "null", "none", "nan"
+                            ),
+                            lit("unkown"),
+                        ).otherwise(trim(col("room_type"))),
+                    )
+                    .withColumn(
+                        "property_type",
+                        when(
+                            col("property_type").isNull()
+                            | (trim(col("property_type")) == "")
+                            | lower(trim(col("property_type"))).isin(
+                                "n/a", "na", "null", "none", "nan"
+                            ),
+                            lit("unkown"),
+                        ).otherwise(trim(col("property_type"))),
+                    )
+                )
+
             if table_name == "HostMetrics":
                 silver_df = silver_df.withColumn(
                     "host_response_time",
@@ -99,6 +136,39 @@ def process_silver_tables(
                         ),
                         lit("unknown"),
                     ).otherwise(trim(col("host_response_time"))),
+                )
+
+            if table_name == "Location":
+                silver_df = silver_df.withColumn(
+                    "host_neighbourhood",
+                    when(
+                        col("host_neighbourhood").isNull()
+                        | (trim(col("host_neighbourhood")) == "")
+                        | lower(trim(col("host_neighbourhood"))).isin(
+                            "n/a", "na", "null", "none", "nan"
+                        ),
+                        lit("unkown"),
+                    ).otherwise(trim(col("host_neighbourhood"))),
+                ).withColumn(
+                    "neighbourhood",
+                    when(
+                        col("neighbourhood").isNull()
+                        | (trim(col("neighbourhood")) == "")
+                        | lower(trim(col("neighbourhood"))).isin(
+                            "n/a", "na", "null", "none", "nan"
+                        ),
+                        lit("unkown"),
+                    ).otherwise(trim(col("neighbourhood"))),
+                )
+
+            if table_name == "RentDetails":
+                silver_df = (
+                    silver_df.withColumn("bedrooms", coalesce(col("bedrooms"), lit(0)))
+                    .withColumn("beds", coalesce(col("beds"), lit(0)))
+                    .withColumn(
+                        "amenities",
+                        coalesce(col("amenities"), lit([]).cast("array<string>")),
+                    )
                 )
 
             if table_name == "RentMetrics":
@@ -114,6 +184,10 @@ def process_silver_tables(
                     .withColumn(
                         "estimated_occupancy_l365d",
                         coalesce(col("estimated_occupancy_l365d"), lit(0)),
+                    )
+                    .withColumn(
+                        "number_of_reviews_ltm",
+                        coalesce(col("number_of_reviews_ltm"), lit(0)),
                     )
                 )
 
@@ -241,7 +315,9 @@ def main() -> None:
         listing_processor.validate_cleaned_data()
 
         non_review_schemas = {
-            name: schema for name, schema in SILVER_SCHEMAS.items() if name != "Review"
+            name: schema
+            for name, schema in SILVER_SCHEMAS.items()
+            if name not in {"Review", "providerDetails", "providerMetrics"}
         }
 
         process_silver_tables(
