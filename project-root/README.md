@@ -38,6 +38,9 @@
             <li>
                 <a href="#docker-setup">Docker setup</a>
             </li>
+            <li>
+                <a href="#credentials-setup">Credentials setup</a>
+            </li>
         </ul>
     </li>
     <li>
@@ -120,6 +123,20 @@ If the installation was successful, both commands should print the installed ver
 For additional installation methods and troubleshooting, refer to the official documentation:
 
 https://docs.docker.com/get-started/
+
+### Credentials setup
+Before running the stack, create your local `.env` file from `.env.example`.
+
+#### Linux / macOS
+```sh
+chmod +x set_default_credentials.sh
+./set_default_credentials.sh
+```
+
+#### Windows
+Windows users should copy `.env.example` to `.env` manually and update values as needed.
+
+> **Important:** `.env` contains credentials and should stay local. 
 
 <!-- RUNNING THE PROJECT -->
 ## Running The Project
