@@ -2,7 +2,7 @@ include:
   - processing/processing-docker-compose.yaml
   - streaming/streaming-docker-compose.yaml
   - orchestration/orchestration-docker-compose.yaml
-
+  - dashboard-service/dashboard-docker-compose.yaml
 networks:
   iceberg_net:
     driver: bridge

@@ -1,0 +1,21 @@
+services:
+  fastapi-dashboard:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: fastapi-dashboard
+    networks:
+      - iceberg_net
+    ports:
+      - "8000:8000"
+    environment:
+      - SPARK_THRIFT_SERVER=spark-iceberg
+      - SPARK_THRIFT_PORT=10000
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - DASHBOARD_MINIO_BUCKET=gold-bucket
+      - DASHBOARD_DATA_DIR=/app/data
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
