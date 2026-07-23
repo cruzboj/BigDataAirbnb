@@ -755,16 +755,3 @@ Handles property listings, including column renaming, missing value fallbacks, a
 *   **`end_date`:** Add this column, retrieving the value from the `start_date` of the *next* row (Lead function).
 
 ---
-
-## 4. Pipeline: `silver_to_gold`
-Business-layer quality rules applied while generating Gold tables.
-
-| Gold Table / Column | Default Value / Action |
-| :--- | :--- |
-| `dimProvider.provider_key` | **Drop row** when `provider_key` is Null |
-| `AggNeighbourhoodInvest.neighbourhood_needed_boost` | Derived from `avg_revenue_l365d`: `> 20000` ➔ `["low"]`, else `["high"]` |
-| `AggAds.provider_name` | Uses already-cleaned `providerDetails.name` from Silver (no extra fallback in Gold) |
-| `dimHost.end_date`, `dimProperty.end_date`, `dimProvider.end_date` | Null is expected for current SCD rows |
-| `factReview` review score columns | Removed from Gold schema/output (`review_scores_rating`, `review_scores_accuracy`, `review_scores_cleanliness`) |
-| `AggNeighborhoodPerformance.avg_review_score` | Removed from Gold schema/output |
-| `AggNeighbourhoodInvest.avg_review_score` | Removed from Gold schema/output |
