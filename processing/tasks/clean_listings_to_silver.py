@@ -1,11 +1,11 @@
 import logging
 from collections.abc import Mapping
 
+from processing.tasks.listing_cleanup import ListingProcessor
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import coalesce, col, lead, lit, lower, trim, when
 from pyspark.sql.types import StructType
 
-from processing.cleanup.listing import ListingProcessor
 from processing.const import BRONZE_BUCKET, SILVER_BUCKET
 from processing.schema import SILVER_SCHEMAS, silver_review_schema
 from processing.session import SparkSessionManager
