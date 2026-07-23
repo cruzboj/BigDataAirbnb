@@ -13,7 +13,7 @@ LISTINGS_PATH = [
     str(DATA_DIR / "listings_copenhagen_denmark.csv.gz"),
     str(DATA_DIR / "listings_chicago_usa.csv.gz"),
 ]
-LATE_ARRIVAL_PATH = "/opt/airflow/data/late-arrival/"
+LATE_ARRIVAL_PATH = "/opt/airflow/data/raw/adsProviders.csv"
 
 # Shared Spark submit dependencies for Airflow DAGs
 SPARK_S3_PACKAGES = os.getenv(

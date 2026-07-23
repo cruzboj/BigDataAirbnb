@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def main():
-    file_path = "./data/late_arrival/adsProviders.csv"
+    file_path = "./data/raw/adsProviders.csv"
 
     print("Loading data...")
     df = pd.read_csv(file_path)

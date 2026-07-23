@@ -50,6 +50,9 @@
                 <a href="#run-project">Run Project</a>
             </li>
             <li>
+                <a href="#prepare-late-arrival-data">Prepare late-arrival data</a>
+            </li>
+            <li>
                 <a href="#kafka-simulate-producer">Kafka simulate Producer</a>
             </li>
         </ul>
@@ -68,8 +71,8 @@ Before running the project, make sure the following software is installed:
 > **Important:** This project uses **uv** for Python package and environment management. The project will not run correctly without it.
 
 our project working with .gz format but can also work with csv
-> **Important:** all data must be contained in file "BigDataAirbnb\project-root\data"
-* "BigDataAirbnb\project-root\data\raw" must contain the raw data
+> **Important:** all data must be contained in `BigDataAirbnb/data`
+* `BigDataAirbnb/data/raw` must contain the raw data
 
 * listing csv | csv.gz must contain name formating listing_<city_name>_<country_name>.csv.gz
 * review csv | csv.gz must contain name formating reviews_<city_name>_<country_name>.csv.gz
@@ -151,7 +154,18 @@ docker compose up -d
 ```
 airflow - may take some time to get up youll need to wait about 5min or so...
 
-Once all services are up and running, start the Kafka producer to simulate real-time Airbnb review events:
+Once all services are up and running, prepare the late-arrival dataset before triggering late-arrival processing in Airflow.
+
+### Prepare late-arrival data
+
+```sh
+uv run python data/random_dates.py
+```
+
+This step refreshes `data/raw/adsProviders.csv` with recent `last_updated` values.
+The late-arrival pipeline keeps only rows within ±48 hours from current time, so if you skip this step the late-arrival upload can be fully skipped or filtered out.
+
+Then start the Kafka producer to simulate real-time Airbnb review events:
 
 <!-- KAFKA PRODUCER -->
 ### Kafka Simulate Producer
