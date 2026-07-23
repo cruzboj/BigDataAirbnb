@@ -21,15 +21,9 @@ def spark_dag():
         wait_for_completion=True,
     )
 
-    trigger_upload = TriggerDagRunOperator(
-        task_id="trigger_upload",
-        trigger_dag_id="upload_raw_dag",
-        wait_for_completion=True,
-    )
-
-    trigger_clean = TriggerDagRunOperator(
-        task_id="trigger_clean",
-        trigger_dag_id="clean_data_dag",
+    trigger_listing_batch = TriggerDagRunOperator(
+        task_id="trigger_listing_batch",
+        trigger_dag_id="listing_batch_pipeline",
         wait_for_completion=True,
     )
 
@@ -41,11 +35,11 @@ def spark_dag():
 
     trigger_late_upload = TriggerDagRunOperator(
         task_id="trigger_late_upload",
-        trigger_dag_id="late_arrival_upload",
+        trigger_dag_id="ads_late_arrival_pipeline",
         wait_for_completion=True,
     )
 
-    trigger_bucket >> trigger_upload >> trigger_clean >> trigger_silver_to_gold
+    trigger_bucket >> trigger_listing_batch >> trigger_silver_to_gold
     trigger_bucket >> trigger_late_upload
 
 

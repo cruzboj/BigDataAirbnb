@@ -7,17 +7,16 @@ from config.const import SPARK_CORES_MAX, SPARK_MAVEN_REPOSITORIES, SPARK_S3_PAC
 
 
 @dag(
-    dag_id="late_arrival_upload",
+    dag_id="ads_late_arrival_pipeline",
     start_date=datetime(2026, 1, 1),
     schedule="0 * * * *",
     catchup=False,
     max_active_runs=1,
 )
-def upload_raw():
-
-    upload_adsprovider_late_arrival = SparkSubmitOperator(
-        task_id="upload_adsprovider_late_arrival",
-        application="/opt/airflow/processing/tasks/upload_late_arrival.py",
+def ads_late_arrival_pipeline() -> None:
+    upload_ads_to_bronze = SparkSubmitOperator(
+        task_id="upload_ads_to_bronze",
+        application="/opt/airflow/processing/tasks/upload_ads_to_bronze.py",
         conn_id="my_spark_conn",
         packages=SPARK_S3_PACKAGES,
         repositories=SPARK_MAVEN_REPOSITORIES,
@@ -32,9 +31,9 @@ def upload_raw():
         retry_delay=timedelta(minutes=1),
     )
 
-    clean_adsprovider_late_arrival_to_silver = SparkSubmitOperator(
-        task_id="clean_adsprovider_late_arrival_to_silver",
-        application="/opt/airflow/processing/tasks/late_arrival_to_silver.py",
+    clean_ads_to_silver = SparkSubmitOperator(
+        task_id="clean_ads_to_silver",
+        application="/opt/airflow/processing/tasks/clean_ads_to_silver.py",
         conn_id="my_spark_conn",
         packages=SPARK_S3_PACKAGES,
         repositories=SPARK_MAVEN_REPOSITORIES,
@@ -49,7 +48,7 @@ def upload_raw():
         retry_delay=timedelta(minutes=1),
     )
 
-    upload_adsprovider_late_arrival >> clean_adsprovider_late_arrival_to_silver
+    upload_ads_to_bronze >> clean_ads_to_silver
 
 
-upload_raw()
+ads_late_arrival_pipeline()

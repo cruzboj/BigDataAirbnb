@@ -27,6 +27,6 @@ SPARK_CORES_MAX = os.getenv("SPARK_CORES_MAX", "4")
 
 # Bronze (streamed Kafka reviews) input path and silver output key for cleaning task
 STREAMING_DATA_PATH = os.getenv(
-    "STREAMING_DATA_PATH", "s3a://bronze-bucket/kafka/reviews/*.parquet"
+    "STREAMING_DATA_PATH", "s3a://bronze-bucket/reviews/review_*.parquet"
 )
 STREAMING_DATA_OUTPUT = os.getenv("STREAMING_DATA_OUTPUT", "Review.parquet")
